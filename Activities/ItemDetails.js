@@ -78,25 +78,24 @@ const PreLoader = () => (
           
           </View>
     
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: PADDING }}>
-    
     <View style={{
       flexDirection: 'row',
+      alignSelf:'center',
       alignItems: 'center',
       justifyContent: 'space-between',
       width: width / 3,
     }}>
       <TouchableOpacity style={{ borderRadius: 25, borderWidth: 2, alignItems: 'center', borderColor: 'lightgreen' }}>
     
-        <MaterialCommunityIcons name="plus" size={28} color="green" onPress={() => {
+        <MaterialCommunityIcons name="plus" size={32} color="green" onPress={() => {
           if (itemNumber < item.rating.count) {
             setItemNumber(itemNumber + 1);
           }
         }} />
       </TouchableOpacity>
-      <Text style={{ ...styles.addItemText, padding: PADDING, margin: PADDING }}>{itemNumber}</Text>
+      <Text style={{ ...styles.addItemText, padding: PADDING, margin: PADDING,fontSize:42}}>{itemNumber}</Text>
       <TouchableOpacity style={{ borderRadius: 25, borderWidth: 2, alignItems: 'center', borderColor: 'orange' }} >
-        <MaterialCommunityIcons name="minus" size={28} color="tomato" onPress={() => {
+        <MaterialCommunityIcons name="minus" size={32} color="tomato" onPress={() => {
           if (itemNumber > 0) {
             setItemNumber(itemNumber - 1);
           }
@@ -104,21 +103,25 @@ const PreLoader = () => (
       </TouchableOpacity>
     </View>
     
-    
-    
-    <Text style={{ ...styles.addItemText, letterSpacing: PADDING }}><Text>$</Text>{item.price}</Text>
-    
-    </View>
-    
             
     
     
             <View style={styles.ratingStyle}>
+              {/* Rating part */}
+              <View style={{flexDirection:'row'}}>
+              
               <Text style={{ ...styles.addItemText, fontWeight:'500'}}>Rating: {item.rating.rate}</Text>
+              
               <View style={{flexDirection:'row',alignItems:'center'}}>
+                <Text style={{ fontWeight: '400'}}>(</Text>
                 <MaterialIcons name="people" size={24} color="black" />
-                <Text style={{ fontWeight: '400' }}>{item.rating.count}</Text>
+                <Text style={{ fontWeight: '400'}}>{item.rating.count})</Text>
+              
               </View>
+              
+              </View>
+              {/* Price Section */}
+              <Text style={{ ...styles.addItemText, letterSpacing: PADDING,fontSize:30 }}><Text>$</Text>{item.price}</Text>
             </View>
     
     
@@ -192,7 +195,7 @@ const styles = StyleSheet.create({
   },
   ratingStyle: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems:'center',
   },
 })
