@@ -1,25 +1,27 @@
-import {  StyleSheet,
-    Text,
-    View,
-    FlatList,
-    Image,
-    Dimensions,
-    TouchableOpacity,
-    SafeAreaView,
-    ActivityIndicator} from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  Image,
+  Dimensions,
+  TouchableOpacity,
+  SafeAreaView,
+  ActivityIndicator
+} from "react-native";
 import React, { useEffect, useState } from "react";
-const ItemList = ({navigation}) => {
-    const [data, setData] = useState([]);
+const ItemList = ({ navigation }) => {
+  const [data, setData] = useState([]);
 
-    useEffect(() => {
-      fetch("https://fakestoreapi.com/products")
-        .then((res) => res.json())
-        .then((json) => {
-          setData(json);
-        });
-    }, []);
-  
-  
+  useEffect(() => {
+    fetch("https://fakestoreapi.com/products")
+      .then((res) => res.json())
+      .then((json) => {
+        setData(json);
+      });
+  }, []);
+
+
   return (
     <SafeAreaView style={styles.container}>
       {data.length === 0 ? (
@@ -37,7 +39,7 @@ const ItemList = ({navigation}) => {
           renderItem={({ item, index }) => {
             return (
               <TouchableOpacity style={styles.itemStyle}
-              onPress={()=>navigation.navigate('ItemDetails',{serial:item.id})}
+                onPress={() => navigation.navigate('ItemDetails', { serial: item.id })}
               >
                 <Text style={{ ...styles.textStyle, ...styles.tagStyle }}>
                   {item.category.toUpperCase()}
@@ -95,6 +97,7 @@ const styles = StyleSheet.create({
   textStyle: {
     fontSize: 14,
     width: Dimensions.get("window").width / 3,
+    alignSelf: 'center'
   },
   tagStyle: {
     transform: [{ rotateZ: "-90deg" }],

@@ -58,6 +58,9 @@ const PreLoader = () => (
             top: TOP_HEADER_HEIGHT,
           }]}>
     
+
+    {/* Bottom info space - bg */}
+    <ScrollView showsVerticalScrollIndicator={false}>
             <Text style={styles.name}>{item.title} • {(item.category).toUpperCase()}</Text>
 
 
@@ -65,8 +68,8 @@ const PreLoader = () => (
             <Text style={{...styles.addItemText,fontSize:18,fontWeight:'600'}}>Description:</Text>
             <View 
             style={{maxHeight:height*0.12}}>
+            {/* Description text scrollview */}
     <ScrollView>
-            {/* Description text */}
             <ReadMore
             numberOfLines={2}
             >
@@ -77,7 +80,7 @@ const PreLoader = () => (
           </ScrollView>
           
           </View>
-    
+          
     <View style={{
       flexDirection: 'row',
       alignSelf:'center',
@@ -88,14 +91,12 @@ const PreLoader = () => (
       <TouchableOpacity style={{ borderRadius: 25, borderWidth: 2, alignItems: 'center', borderColor: 'lightgreen' }}>
     
         <MaterialCommunityIcons name="plus" size={32} color="green" onPress={() => {
-          if (itemNumber < item.rating.count) {
-            setItemNumber(itemNumber + 1);
-          }
+           setItemNumber(itemNumber + 1);
         }} />
       </TouchableOpacity>
-      <Text style={{ ...styles.addItemText, padding: PADDING, margin: PADDING,fontSize:42}}>{itemNumber}</Text>
-      <TouchableOpacity style={{ borderRadius: 25, borderWidth: 2, alignItems: 'center', borderColor: 'orange' }} >
-        <MaterialCommunityIcons name="minus" size={32} color="tomato" onPress={() => {
+      <Text style={{ ...styles.addItemText, paddingHorizontal: PADDING, marginHorizontal: PADDING,fontSize:42}}>{itemNumber}</Text>
+      <TouchableOpacity style={{ borderRadius: 25, borderWidth: 2, alignItems: 'center', borderColor: 'tomato' }} >
+        <MaterialCommunityIcons name="minus" size={32} color="red" onPress={() => {
           if (itemNumber > 0) {
             setItemNumber(itemNumber - 1);
           }
@@ -126,6 +127,7 @@ const PreLoader = () => (
     
     
           
+              </ScrollView>
           </View>
 
 
@@ -133,7 +135,7 @@ const PreLoader = () => (
           <View style={{ flexDirection: 'row', alignSelf: 'center', position: 'absolute', bottom: PADDING }}>
             <TouchableOpacity activeOpacity={0.5} style={{alignItems:'center',flexDirection:'row', padding: PADDING, borderWidth: 2, borderRadius: 12, borderColor: 'red' }}>
               <MaterialCommunityIcons name="cart-heart" size={34} color="red" />
-              <Text style={{ ...styles.addItemText, color: 'red', fontSize: 18, marginHorizontal: PADDING }}>Add to wishlist</Text>               
+            {itemNumber > 0 ? null:(<Text style={{ ...styles.addItemText, color: 'red', fontSize: 18, marginHorizontal: PADDING }}>Add to wishlist</Text>)}                 
             </TouchableOpacity>
             {itemNumber > 0 ? (<TouchableOpacity activeOpacity={0.7} style={{ flexDirection: 'row', backgroundColor: 'red', alignItems: 'center', marginHorizontal: PADDING * 2, borderRadius: 12, padding: PADDING }}>
               <MaterialCommunityIcons name="cart-arrow-down" size={24} color="white" backgroundColor={"red"} style={{ marginHorizontal: PADDING }} />
@@ -177,16 +179,10 @@ const styles = StyleSheet.create({
   },
   bg: {
     position: 'absolute',
-    paddingHorizontal: PADDING,
+    paddingHorizontal: 2*PADDING,
     marginHorizontal: PADDING,
     width:'100%',
-    justifyContent:'space-evenly',
     paddingBottom:38 + 2*PADDING
-  },
-  priceSection: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
   },
   addItemText: {
     fontWeight: '800',
