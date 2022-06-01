@@ -1,11 +1,13 @@
 {
   "expo": {
-    "name": "DressOnline",
+    "name": "DressOnline[Pulished]",
     "slug": "DressOnline",
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "description": "Tryout/Production : IDK",
+    "githubUrl": "https://github.com/islam-42161/DressOnline"
   },
   "name": "DressOnline"
 }
