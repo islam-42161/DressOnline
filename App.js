@@ -5,6 +5,7 @@ import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
+
 import { Ionicons } from '@expo/vector-icons';
 import Home from './Activities/Home';
 import Settings from './Activities/Settings';
@@ -13,7 +14,9 @@ const Navigator = createBottomTabNavigator().Navigator;
 
 const App = () => {
   return (
+
     <NavigationContainer>
+      
       <Navigator initialRouteName='Home'
               screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused, color, size }) => {
@@ -42,7 +45,6 @@ const App = () => {
         <Screen name="Home" component={Home} options={{ tabBarBadge: null }}/>
         <Screen name='Settings' component={Settings} options={{ tabBarBadge: null }}/>
       </Navigator>
-
       <StatusBar style="auto" />
     </NavigationContainer>
   )

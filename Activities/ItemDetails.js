@@ -1,16 +1,18 @@
 import { StyleSheet, Text, View, Image, Dimensions, TouchableOpacity, ScrollView, SafeAreaView, ActivityIndicator, StatusBar as SB } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
-import ReadMore from 'react-native-read-more-text';
+import ReadMore from '@fawazahmed/react-native-read-more';
+
 
 const statusBarHeight = SB.currentHeight;
 const ItemDetails = ({ route, navigation }) => {
   const { height, width } = Dimensions.get('window');
   const { serial } = route.params;
   const [item, setItem] = useState(null);
-  const TOP_HEADER_HEIGHT = height * 0.6;
+  const TOP_HEADER_HEIGHT = height * 0.5;
 
   const [itemNumber, setItemNumber] = useState(0);
+  const [detailsfull,setDetailsFull] = useState(true);
 
   useEffect(() => {
     fetch(`https://fakestoreapi.com/products/${serial}`)
@@ -35,51 +37,56 @@ const ItemDetails = ({ route, navigation }) => {
     return (
       <SafeAreaView style={styles.container}>
         {/* Top image */}
-        <View style={{ marginTop: statusBarHeight}}>
+        <View style={{marginTop:Platform.OS === "android" ? SB.currentHeight : 0}}>
+          <TouchableOpacity style={{zIndex:1,position:'absolute',top:4*PADDING,right:PADDING,backgroundColor:'white', padding:PADDING, borderRadius:20,alignItems:'center',elevation:PADDING}}>
+          <MaterialCommunityIcons name="cards-heart" size={30} color="red" />
+          </TouchableOpacity>
           <Image source={{ uri: item.image }} resizeMode={'contain'} style={{ width:width*0.95, height: TOP_HEADER_HEIGHT-statusBarHeight}} />
         </View>
         {/* Bottom info */}
         <View style={{width, height: height - TOP_HEADER_HEIGHT,padding:2*PADDING}}>
-          <Text style={{ fontSize: 18, fontWeight: '600' }}>{item.title}</Text>
+          <Text style={{ fontSize: 20, fontWeight: '600'}}>{item.title}</Text>
+
 
           {/* category • ⭐rating(123) • $price*/}
-          <View style={{ flexDirection: 'row',width:width*0.95 }}>
-            <Text style={{ textTransform: 'capitalize' }}>{item.category} • </Text>
-            <Text>⭐{item.rating.rate}({item.rating.count}) • </Text>
-            <Text style={{fontWeight:'bold',letterSpacing:PADDING/2}}>${item.price}</Text>
-          </View>
+            <Text style={{ textTransform: 'capitalize',maxWidth:width*0.95,fontSize:16,marginVertical:PADDING}}>{item.category} • <Text>⭐{item.rating.rate}({item.rating.count})</Text> • <Text style={{fontWeight:'bold',letterSpacing:PADDING/2}}>${item.price}</Text></Text>
+
+
+
 
 
       <View style={{backgroundColor:'lightgray',height:1,width:width*0.95,marginVertical:PADDING}}/>
 
           {/* description and item add button */}
-          <Text>Description:</Text>
-          <View style={{ flexDirection: 'row',alignItems:'center',marginVertical:PADDING*2}}>
+          <Text style={{fontSize:15,fontWeight:'bold',marginTop:PADDING}}>Details:</Text>
+          <View style={{ flexDirection: 'row',alignItems:'center'}}>
 
-            <ScrollView
-              style={{ alignSelf:'flex-start',maxHeight: (height - TOP_HEADER_HEIGHT) * 0.4, maxWidth: width * 0.8}}
-            >
-              <ReadMore
-                numberOfLines={4}
-              >
-                <Text style={{ lineHeight: 20, fontStyle: 'italic' }}>{item.description}</Text>
-              </ReadMore>
+{/* Details text */}
+<View style={{height: (height - TOP_HEADER_HEIGHT) * 0.35,width: width * 0.8,alignSelf:'flex-start'}}>
+            <ScrollView showsVerticalScrollIndicator={false}>
+
+                <ReadMore numberOfLines={5} style={{lineHeight:20,paddingVertical:PADDING}}>
+                {item.description}
+                </ReadMore>
+
             </ScrollView>
+            
+            </View>
 
             <View style={{ alignItems: 'center',flex:1,padding:PADDING}}>
-              <View style={{alignItems:'center',backgroundColor:'rgba(255,255,255,0.4)',borderRadius:15,elevation:PADDING*2}}>
+              <View style={{alignItems:'center',backgroundColor:'lightgray',borderRadius:15,elevation:PADDING*2,alignSelf:'flex-end'}}>
               <TouchableOpacity style={{ alignItems: 'center', backgroundColor: 'white', borderTopLeftRadius: 15, borderTopRightRadius: 15 }} onPress={()=>{
                 setItemNumber(itemNumber+1);
               }}>
-                <MaterialCommunityIcons name="plus" size={30} color="black" />
+                <MaterialCommunityIcons name="plus" size={34} color="black" />
               </TouchableOpacity>
 
-              <Text style={{fontWeight:'700',fontSize:18}}>{itemNumber}</Text>
+              <Text style={{fontWeight:'600',fontSize:20}}>{itemNumber}</Text>
 
               <TouchableOpacity style={{ alignItems: 'center', backgroundColor: 'white', borderBottomLeftRadius: 15, borderBottomRightRadius: 15 }} onPress={()=>{
                 itemNumber>0?setItemNumber(itemNumber-1):null;
               }}>
-                <MaterialCommunityIcons name="minus" size={30} color="black" />
+                <MaterialCommunityIcons name="minus" size={34} color="black" />
               </TouchableOpacity>
             </View>
               </View>
@@ -91,16 +98,13 @@ const ItemDetails = ({ route, navigation }) => {
 <View style={{
   justifyContent:'center',
   position:'absolute',
-  bottom:0
+  bottom:0,
   }}>
   <View style={{flexDirection:'row',justifyContent:'center'}}>
-  <TouchableOpacity activeOpacity={0.6} style={{elevation:PADDING,marginBottom:PADDING,flexDirection:'row',alignItems:'center',justifyContent:'space-evenly',borderWidth:2,borderRadius:12,borderColor:'red',backgroundColor:'white',padding:PADDING,marginHorizontal:PADDING}}>
-    <MaterialCommunityIcons name="cart-heart" size={30} color="red"/>
-    {itemNumber===0?(<Text style={{marginHorizontal:PADDING,color:'red'}}>Add to wishlist</Text>):null}
-  </TouchableOpacity>
+
   {itemNumber>0?(
-    <TouchableOpacity activeOpacity={0.6} style={{elevation:PADDING,marginBottom:PADDING,flexDirection:'row',alignItems:'center',justifyContent:'space-evenly',borderRadius:12,backgroundColor:'darkgreen',padding:PADDING,marginHorizontal:PADDING}}>
-    <MaterialCommunityIcons name="cart-check" size={30} color="white" />
+    <TouchableOpacity activeOpacity={0.6} style={{marginBottom:PADDING,flexDirection:'row',alignItems:'center',justifyContent:'space-evenly',borderRadius:6,backgroundColor:'black',padding:PADDING,marginHorizontal:PADDING,elevation:PADDING}}>
+    <MaterialCommunityIcons name="cart-check" size={24} color="white" />
     <Text style={{marginHorizontal:PADDING,color:'white',fontWeight:'800'}}>Checkout Now</Text>
     <Text style={{marginHorizontal:PADDING,color:'white',letterSpacing:PADDING/2}}>${(item.price * itemNumber).toFixed(2)}</Text>
   </TouchableOpacity>
@@ -130,5 +134,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'white',
+    paddingTop: Platform.OS === "android" ? SB.currentHeight : 0
   },
 })

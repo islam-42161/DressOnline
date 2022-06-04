@@ -7,8 +7,10 @@ import {
   Dimensions,
   TouchableOpacity,
   SafeAreaView,
-  ActivityIndicator
+  ActivityIndicator,
+  StatusBar as SB,
 } from "react-native";
+
 import React, { useEffect, useState } from "react";
 const ItemList = ({ navigation }) => {
   const [data, setData] = useState([]);
@@ -23,6 +25,7 @@ const ItemList = ({ navigation }) => {
 
 
   return (
+    
     <SafeAreaView style={styles.container}>
       {data.length === 0 ? (
         <View>
@@ -80,6 +83,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    paddingTop: Platform.OS === "android" ? SB.currentHeight : 0
   },
   itemStyle: {
     margin: PADDING,
