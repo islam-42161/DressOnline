@@ -39,10 +39,11 @@ const ItemDetails = ({ route, navigation }) => {
       <SafeAreaView style={styles.container}>
         {/* Top image */}
         <View style={{marginTop:Platform.OS === "android" ? SB.currentHeight : 0}}>
-          <TouchableOpacity style={{zIndex:1,position:'absolute',bottom:PADDING,right:PADDING,backgroundColor:'white', padding:PADDING, borderRadius:25,alignItems:'center',elevation:PADDING/2}}>
-          <MaterialCommunityIcons name="cards-heart" size={30} color="red" />
-          </TouchableOpacity>
           <Image source={{ uri: item.image }} resizeMode={'contain'} style={{ width:width*0.95, height: TOP_HEADER_HEIGHT-statusBarHeight}} />
+          <TouchableOpacity style={{position:'absolute',bottom:PADDING,right:PADDING,flexDirection:'row',backgroundColor:'white',borderRadius:25,alignItems:'center',borderWidth:1,borderColor:'red',padding:PADDING}}>
+              <MaterialCommunityIcons name="cards-heart" size={18} color="red" style={{marginHorizontal:PADDING}}/>
+              <Text style={{marginRight:PADDING,color:'red',fontWeight:'500'}}>Add to wishlist</Text>
+            </TouchableOpacity>
         </View>
         {/* Bottom info */}
         <View style={{width, height: height - TOP_HEADER_HEIGHT,padding:2*PADDING}}>
@@ -50,10 +51,8 @@ const ItemDetails = ({ route, navigation }) => {
 
 
           {/* category • ⭐rating(123) • $price*/}
-            <Text style={{ textTransform: 'capitalize',maxWidth:width*0.95,fontSize:16,marginVertical:PADDING}}>{item.category} • <Text>⭐{item.rating.rate}({item.rating.count})</Text> • <Text style={{fontWeight:'bold',letterSpacing:PADDING/2}}>${item.price}</Text></Text>
-
-
-
+          
+            <Text style={{ textTransform: 'capitalize',fontSize:16,maxWidth:width*0.95,marginVertical:PADDING}}>{item.category} • <Text>⭐{item.rating.rate}({item.rating.count})</Text> • <Text style={{fontWeight:'bold',letterSpacing:PADDING/2}}>${item.price}</Text></Text>
 
 
       <View style={{backgroundColor:'lightgray',height:1,width:width*0.95,marginVertical:PADDING}}/>
