@@ -28,12 +28,7 @@ const ItemList = ({ navigation }) => {
     
     <SafeAreaView style={styles.container}>
       {data.length === 0 ? (
-        <View>
           <ActivityIndicator />
-          <Text style={{ fontSize: 15, color: "black" }}>
-            Content loading...
-          </Text>
-        </View>
       ) : (
         <FlatList
           numColumns={2}
