@@ -14,6 +14,7 @@ const ItemDetails = ({ route, navigation }) => {
   const TOP_HEADER_HEIGHT = height * 0.5;
 
   const [itemNumber, setItemNumber] = useState(0);
+  const [inWishList, setInWishList] = useState(false);
 
   useEffect(() => {
     fetch(`https://fakestoreapi.com/products/${serial}`)
@@ -27,7 +28,7 @@ const ItemDetails = ({ route, navigation }) => {
 
   const PreLoader = () => (
     <SafeAreaView style={styles.container}>
-      <ActivityIndicator/>
+      <ActivityIndicator />
     </SafeAreaView>
   )
 
@@ -38,101 +39,115 @@ const ItemDetails = ({ route, navigation }) => {
     return (
       <SafeAreaView style={styles.container}>
         {/* Top image */}
-        <View style={{marginTop:Platform.OS === "android" ? SB.currentHeight : 0}}>
-          <Image source={{ uri: item.image }} resizeMode={'contain'} style={{ width:width*0.95, height: TOP_HEADER_HEIGHT-statusBarHeight}} />
-          <TouchableOpacity style={{position:'absolute',bottom:PADDING,right:PADDING,flexDirection:'row',backgroundColor:'white',borderRadius:25,alignItems:'center',borderWidth:1,borderColor:'red',padding:PADDING}}>
-              <MaterialCommunityIcons name="cards-heart" size={18} color="red" style={{marginHorizontal:PADDING}}/>
-              <Text style={{marginRight:PADDING,color:'red',fontWeight:'500'}}>Add to wishlist</Text>
-            </TouchableOpacity>
+        <View style={{ marginTop: Platform.OS === "android" ? SB.currentHeight : 0 }}>
+          <Image source={{ uri: item.image }} resizeMode={'contain'} style={{ width: width * 0.95, height: TOP_HEADER_HEIGHT - statusBarHeight }} />
+          <TouchableOpacity activeOpacity={0.8} style={{ position: 'absolute', bottom: PADDING, right: PADDING, flexDirection: 'row', backgroundColor: 'white', borderRadius: 25, alignItems: 'center', borderWidth: 1, borderColor: 'red', padding: PADDING }}>
+            <MaterialCommunityIcons name="cards-heart" size={18} color="red" style={{ marginHorizontal: PADDING }} />
+            <Text style={{ marginRight: PADDING, color: 'red', fontWeight: '500' }}>Add to wishlist</Text>
+          </TouchableOpacity>
         </View>
         {/* Bottom info */}
-        <View style={{width, height: height - TOP_HEADER_HEIGHT,padding:2*PADDING}}>
-          <Text style={{ fontSize: 20, fontWeight: '700'}}>{item.title}</Text>
+        <View style={{ width, height: height - TOP_HEADER_HEIGHT, padding: 2 * PADDING }}>
+          <Text style={{ fontSize: 20, fontWeight: '700' }}>{item.title}</Text>
 
 
           {/* category • ⭐rating(123) • $price*/}
-          
-            <Text style={{ textTransform: 'capitalize',fontSize:16,maxWidth:width*0.95,marginVertical:PADDING}}>{item.category} • <Text>⭐{item.rating.rate}({item.rating.count})</Text> • <Text style={{fontWeight:'bold',letterSpacing:PADDING/2}}>${item.price}</Text></Text>
+
+          <Text style={{ textTransform: 'capitalize', fontSize: 16, maxWidth: width * 0.95, marginVertical: PADDING }}>{item.category} • <Text>⭐{item.rating.rate}({item.rating.count})</Text> • <Text style={{ fontWeight: 'bold', letterSpacing: PADDING / 2 }}>${item.price}</Text></Text>
 
 
-      <View style={{backgroundColor:'lightgray',height:1,width:width*0.95,marginVertical:PADDING}}/>
+          <View style={{ backgroundColor: 'lightgray', height: 1, width: width * 0.95, marginVertical: PADDING }} />
 
           {/* description and item add button */}
-          <Text style={{fontSize:18,fontWeight:'600',marginTop:PADDING}}>Details:</Text>
-          <View style={{ flex:1,flexDirection: 'row',alignItems:'center'}}>
+          <Text style={{ fontSize: 18, fontWeight: '600', marginTop: PADDING }}>Details:</Text>
+          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
 
-{/* Details text */}
-<View style={{width: width * 0.8,alignSelf:'flex-start',paddingBottom:PADDING*2}}>
-            <ScrollView showsVerticalScrollIndicator={false}>
+            {/* Details text */}
+            <View style={{ width: width * 0.8, alignSelf: 'flex-start', paddingBottom: PADDING * 2 }}>
+              <ScrollView showsVerticalScrollIndicator={false}>
 
-                <ReadMore numberOfLines={4} style={{lineHeight:25,paddingVertical:PADDING,fontSize:16}}>
-                {item.description}
+                <ReadMore numberOfLines={3} style={{ lineHeight: 25, paddingVertical: PADDING, fontSize: 14 }}>
+                  {item.description}
                 </ReadMore>
 
-            </ScrollView>
-            
+              </ScrollView>
+
             </View>
 
-{/* +- button to add to cart */}
-            <View style={{ alignItems: 'center',flex:1,padding:PADDING,alignSelf:'flex-start'}}>
-              <View style={{alignItems:'center',backgroundColor:'#F3F3F3',borderRadius:15,elevation:PADDING*2,alignSelf:'center'}}>
-              <TouchableOpacity style={{ alignItems: 'center', backgroundColor: 'white', borderTopLeftRadius: 15, borderTopRightRadius: 15 }} onPress={()=>{
-                setItemNumber(itemNumber+1);
-              }}>
-                <MaterialCommunityIcons name="plus" size={40} color="black" />
-              </TouchableOpacity>
+            {/* +- button to add to cart */}
+            <View style={{ alignItems: 'center', flex: 1, padding: PADDING, alignSelf: 'flex-start' }}>
+              <View style={{ alignItems: 'center', backgroundColor: '#F3F3F3', borderRadius: 15, elevation: PADDING * 2, alignSelf: 'center' }}>
+                <TouchableOpacity style={{ alignItems: 'center', backgroundColor: 'white', borderTopLeftRadius: 15, borderTopRightRadius: 15 }} onPress={() => {
+                  setItemNumber(itemNumber + 1);
+                }}>
+                  <MaterialCommunityIcons name="plus" size={40} color="black" />
+                </TouchableOpacity>
 
-              <Text style={{fontWeight:'600',fontSize:24}}>{itemNumber}</Text>
+                <Text style={{ fontWeight: '600', fontSize: 24 }}>{itemNumber}</Text>
 
-              <TouchableOpacity style={{ alignItems: 'center', backgroundColor: 'white', borderBottomLeftRadius: 15, borderBottomRightRadius: 15 }} onPress={()=>{
-                itemNumber>0?setItemNumber(itemNumber-1):null;
-              }}>
-                <MaterialCommunityIcons name="minus" size={40} color="black" />
-              </TouchableOpacity>
-            </View>
+                <TouchableOpacity style={{ alignItems: 'center', backgroundColor: 'white', borderBottomLeftRadius: 15, borderBottomRightRadius: 15 }} 
+                onLongPress={() => {
+                  setItemNumber(0);
+                }}
+                onPress={() => {
+                  itemNumber > 0 ? setItemNumber(itemNumber - 1) : null;
+                }}>
+                  <MaterialCommunityIcons name="minus" size={40} color="black" />
+                </TouchableOpacity>
               </View>
+            </View>
 
-              
+
           </View>
 
-{/* Bottom buttons */}
-<View style={{
-  alignSelf:'center',
-  marginBottom:PADDING*8,
-  marginTop:PADDING*2,
-  marginHorizontal:PADDING*2,
-  flexDirection:'row',
-  alignItems:'center',
-  }}>
-  
-{/* back to shopping */}
+          {/* Bottom buttons */}
+          <View style={{
+            alignSelf: 'center',
+            marginBottom: PADDING * 8,
+            marginTop: PADDING * 2,
+            marginHorizontal: PADDING * 2,
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}>
 
-<TouchableOpacity activeOpacity={0.6} style={{marginBottom:PADDING,flexDirection:'row',backgroundColor:'white',alignItems:'center',justifyContent:'space-evenly',elevation:PADDING,padding:PADDING,borderRadius:16,marginLeft:PADDING}} onPress={
-      ()=> navigation.goBack()
-      }>
-  <MaterialCommunityIcons name="format-list-text" size={28} color="tomato" style={{marginHorizontal:PADDING}}/>
-  <Text style={{color:'tomato',fontWeight:'600',marginHorizontal:PADDING}}>Back to shopping</Text>
-</TouchableOpacity>
+            {/* back to shopping */}
 
-{/* add to cart button */}
-  <View>
-    <TouchableOpacity activeOpacity={0.6} style={{marginBottom:PADDING,flexDirection:'row',alignItems:'center',justifyContent:'space-evenly',borderRadius:16,backgroundColor:itemNumber>0?'white':'lightgray',padding:PADDING,marginLeft:PADDING,elevation:itemNumber>0?PADDING:0}} disabled={itemNumber>0?false:true}>
-    <MaterialCommunityIcons name="shopping" size={28} color={itemNumber>0?'black':'rgba(0,0,0,0.2)'} style={{marginHorizontal:PADDING}} />
-    <Text style={{marginHorizontal:PADDING,color:itemNumber>0?'black':'rgba(0,0,0,0.2)',fontWeight:'600'}}>Cart</Text>
-    {/* total price text */}
-  </TouchableOpacity>
-    <Text style={{fontSize:10,backgroundColor:itemNumber>0?'lightgreen':'white',borderRadius:100,padding:PADDING/4,fontWeight:'700',letterSpacing:PADDING/2,color:itemNumber>0?'white':'rgba(0,0,0,0.2)',position:'absolute',top:-PADDING*2,right:-PADDING,zIndex:100}}>${(item.price * itemNumber).toFixed(2)}</Text>
-  </View>
+            <TouchableOpacity activeOpacity={0.6} style={{ marginBottom: PADDING, flexDirection: 'row', backgroundColor: 'white', alignItems: 'center', justifyContent: 'space-evenly', elevation: PADDING, padding: PADDING, borderRadius: 16, marginLeft: PADDING }} onPress={
+              () => navigation.goBack()
+            }>
+              <MaterialCommunityIcons name="format-list-text" size={18} color="tomato" style={{ marginHorizontal: PADDING }} />
+              <Text style={{ color: 'tomato', fontWeight: '700', marginHorizontal: PADDING }}>Keep Shopping</Text>
+            </TouchableOpacity>
 
-{/* delete all from cart button */}
-<TouchableOpacity style={{elevation:itemNumber>0?PADDING/2:null,borderRadius:20,backgroundColor:'#fbe9e9',padding:PADDING,marginLeft:PADDING}} onPress={()=>setItemNumber(0)} disabled={itemNumber>0?false:true}>
-  <MaterialCommunityIcons name="delete-empty-outline" size={24} color={itemNumber>0?"#f9b5b5":"#ffdada"} />
-</TouchableOpacity>
-  
-  </View>
-  
-  </View>
+            {
+              // add to cart
+              itemNumber > 0 ? (
+                <View>
+                  <TouchableOpacity activeOpacity={0.6} style={{ marginBottom: PADDING, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', borderRadius: 16, backgroundColor: 'black', padding: PADDING, marginLeft: PADDING, elevation: PADDING }} disabled={itemNumber > 0 ? false : true}>
+                    <MaterialCommunityIcons name="cart" size={18} color={'white'} style={{ marginHorizontal: PADDING }} />
 
+                    <Text style={{ marginHorizontal: PADDING, color: 'white', fontWeight: '700' }}>Cart</Text>
+
+                    {/* total price text */}
+                  </TouchableOpacity>
+                  <Text style={{ fontSize: 9, backgroundColor: 'green', borderRadius: 100, padding: PADDING / 4, fontWeight: '800', letterSpacing: PADDING / 2, color: 'white', position: 'absolute', top: -PADDING * 2.5, right: -PADDING * 1.5, zIndex: 100 }}>${(item.price * itemNumber).toFixed(2)}</Text>
+                </View>
+              ) : null
+            }
+            {
+              // delete all items from cart
+              itemNumber > 0 ? (
+                <TouchableOpacity style={{marginBottom:PADDING,flexDirection:'row',elevation: PADDING, alignItems: 'center', justifyContent: 'space-evenly', borderRadius: 16, backgroundColor: 'black', padding: PADDING, marginHorizontal: PADDING }}>
+                  <MaterialCommunityIcons name="shopping" size={18} color={"white"} style={{ marginHorizontal: PADDING }} />
+                  <Text style={{ marginHorizontal: PADDING, color: 'white', fontWeight: '700'}}>Buy Now</Text>
+                </TouchableOpacity>
+              ) : null
+            }
+
+
+          </View>
+
+        </View>
 
       </SafeAreaView>
 
