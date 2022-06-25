@@ -5,6 +5,8 @@ import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
+import { SafeAreaProvider } from 'react-native-safe-area-context'
+
 
 import { Ionicons } from '@expo/vector-icons';
 import Home from './Activities/Home';
@@ -14,7 +16,7 @@ const Navigator = createBottomTabNavigator().Navigator;
 
 const App = () => {
   return (
-
+<SafeAreaProvider>
     <NavigationContainer>
       
       <Navigator initialRouteName='Home'
@@ -33,7 +35,7 @@ const App = () => {
                   // You can return any component that you like here!
                   return <Ionicons name={iconName} size={size} color={color} />;
                 },
-                tabBarActiveTintColor: 'tomato',
+                tabBarActiveTintColor: 'dodgerblue',
                 tabBarInactiveTintColor: 'gray',
                 header: ()=>null,
                 tabBarBadgeStyle:{
@@ -47,6 +49,7 @@ const App = () => {
       </Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>
+    </SafeAreaProvider>
   )
 }
 

@@ -6,10 +6,11 @@ import {
   Image,
   Dimensions,
   TouchableOpacity,
-  SafeAreaView,
   ActivityIndicator,
   StatusBar as SB,
 } from "react-native";
+
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import React, { useEffect, useState } from "react";
 const ItemList = ({ navigation }) => {
@@ -78,7 +79,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    paddingTop: Platform.OS === "android" ? SB.currentHeight : 0
+    backgroundColor: "#F5FCFF",
   },
   itemStyle: {
     margin: PADDING,
@@ -86,7 +87,6 @@ const styles = StyleSheet.create({
     borderRadius: 2 * PADDING,
     backgroundColor: "white",
     padding: PADDING,
-    elevation: 10,
   },
   imageStyle: {
     width: Dimensions.get("window").width / 2.2,
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     paddingVertical: PADDING,
     marginLeft: PADDING,
-    backgroundColor: "rgba(255,0,0,0.4)",
+    backgroundColor: "rgba(0,255,0,0.4)",
     borderRadius: PADDING,
     fontWeight: "bold",
     fontFamily: "sans-serif-condensed",
