@@ -1,27 +1,46 @@
 import {
   StyleSheet,
   Text,
-  View,
+  NetInfo,
   FlatList,
   Image,
   Dimensions,
   TouchableOpacity,
   ActivityIndicator,
   StatusBar as SB,
+  RefreshControl,
 } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+
+const wait = (timeout) => {
+  return new Promise(resolve => setTimeout(resolve, timeout));
+}
+
 const ItemList = ({ navigation }) => {
   const [data, setData] = useState([]);
+  const [refreshing,setRefreshing] = useState(false);
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    wait(2000).then(() => {
+      setRefreshing(false);
+      loadData();
+    });
+  }, []);
 
-  useEffect(() => {
+  async function loadData(){
+    //fetch("https://api.escuelajs.co/api/v1/products") -> another api with larger dataset
     fetch("https://fakestoreapi.com/products")
       .then((res) => res.json())
       .then((json) => {
         setData(json);
       });
+  }
+
+  useEffect(() => {
+loadData();
   }, []);
 
 
@@ -35,6 +54,12 @@ const ItemList = ({ navigation }) => {
           numColumns={2}
           data={data}
           contentContainerStyle={styles.flatlistStyle}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+            />
+          }
           renderItem={({ item, index }) => {
             return (
               <TouchableOpacity style={styles.itemStyle}

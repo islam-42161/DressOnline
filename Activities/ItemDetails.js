@@ -1,9 +1,10 @@
-import { ActivityIndicator, Dimensions, Image, StyleSheet, Text, TouchableOpacity, View,ToastAndroid } from 'react-native'
+import { ActivityIndicator, Dimensions, Image, StyleSheet, Text, TouchableOpacity, View, ToastAndroid, Share } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { LinearGradient } from 'expo-linear-gradient';
 import ReadmoreCustom from '../components/ReadmoreCustom';
+import AddCommentModal from '../components/AddCommentModal';
 
 const { width, height } = Dimensions.get('window');
 
@@ -13,20 +14,21 @@ const ItemDetails = ({ route }) => {
   const [data, setData] = useState(null);
   const [wishlisted, setWishlisted] = useState(false);
   const [cartButtonHeight, setCartButtonHeight] = useState(0);
+  const [modalVisible,setModalVisible] = useState(false);
 
 
   const toggleWishList = () => { //To toggle the show text or hide it
-    !wishlisted?ToastAndroid.showWithGravity(
-      "Added to wishlist",
+    !wishlisted ? ToastAndroid.showWithGravity(
+      `${data.title} added to wishlist`,
       ToastAndroid.SHORT,
       ToastAndroid.CENTER
     )
-    :
-    ToastAndroid.showWithGravity(
-      "Removed from wishlist",
-      ToastAndroid.SHORT,
-      ToastAndroid.CENTER
-    )
+      :
+      ToastAndroid.showWithGravity(
+        "Removed from wishlist",
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER
+      )
     setWishlisted(!wishlisted);
   }
 
@@ -39,11 +41,31 @@ const ItemDetails = ({ route }) => {
 
 
   const TotalPrice = ({ style }) =>
-    (
-      <Text style={style}>{
-        `$ ${(items * data.price).toFixed(2)}`
-      }</Text>
-    );
+  (
+    <Text style={style}>{
+      `$ ${(items * data.price).toFixed(2)}`
+    }</Text>
+  );
+
+  const onShare = async () => {
+    try {
+      const result = await Share.share({
+        message: `${data.title} | $ ${data.price} | ${data.category.toUpperCase()}`,
+        url: data.image,
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error) {
+      alert(error.message);
+    }
+  };
 
 
   return (
@@ -51,14 +73,14 @@ const ItemDetails = ({ route }) => {
 
 
 
-
       {data ? (
-        <>
+        <View>
+          <AddCommentModal modalVisible={modalVisible} setModalVisible={setModalVisible}/>
           {/* Top image and wishlist components */}
           <View style={{ width: width, alignItems: 'center' }}>
             {/* top image */}
             <View style={styles.imageStyle}>
-              <Image source={{ uri: data.image }} style={{...StyleSheet.absoluteFillObject,marginBottom:10}} resizeMode={'contain'} />
+              <Image source={{ uri: data.image }} style={{ ...StyleSheet.absoluteFillObject, marginBottom: 10 }} resizeMode={'contain'} />
             </View>
             {/* Wishlist button */}
             <LinearGradient
@@ -80,7 +102,7 @@ const ItemDetails = ({ route }) => {
                 {data.category.toUpperCase()}
               </Text>
               <Text style={{ marginHorizontal: 5 }}>•</Text>
-              <MaterialCommunityIcons name="star" size={20} color="yellow" />
+              <MaterialCommunityIcons name="star" size={20} color="#F8ED62" />
               <Text style={{ ...styles.textStyle, fontWeight: 'normal', fontSize: 14 }}>
                 {data.rating.rate}({data.rating.count})
               </Text>
@@ -104,8 +126,8 @@ const ItemDetails = ({ route }) => {
 
               </View>
               {/* +- button, chat button, up/down vote button */}
-              <View style={{alignItems:'center',marginBottom:cartButtonHeight, marginTop: 10, marginLeft: 10,justifyContent:'space-between'}}>
-              
+              <View style={{ alignItems: 'center', marginBottom: cartButtonHeight, marginTop: 10, marginLeft: 10, justifyContent: 'space-between' }}>
+
                 {/* +- button */}
                 <View style={{ alignItems: 'center', backgroundColor: '#e2f9de', justifyContent: 'space-evenly', borderRadius: 5, borderColor: 'rgba(0,0,0,0.1)', elevation: 5 }}>
                   <TouchableOpacity
@@ -114,7 +136,7 @@ const ItemDetails = ({ route }) => {
                   >
                     <MaterialCommunityIcons name="plus" size={32} color="#3ca98b" />
                   </TouchableOpacity>
-                  <Text style={{ fontWeight: 'bold', fontSize: 24, color: '#18866C', marginVertical: 10 }}>
+                  <Text style={{ fontWeight: 'bold', fontSize: 24, color: '#18866C'}}>
                     {items}
                   </Text>
                   <TouchableOpacity style={{ alignItems: 'center', borderRadius: 5, backgroundColor: 'white', margin: 2 }}
@@ -122,24 +144,28 @@ const ItemDetails = ({ route }) => {
                     onLongPress={() => { setItems(0) }}
                     disabled={!items}
                   >
-                    <MaterialCommunityIcons name="minus" size={32} color= {items>0?"#3ca98b":"lightgray"} />
+                    <MaterialCommunityIcons name="minus" size={32} color={items > 0 ? "#3ca98b" : "lightgray"} />
                   </TouchableOpacity>
                 </View>
 
-              <TouchableOpacity style={{alignItems:'center',justifyContent:'center',width:40,height:40,borderRadius:20,backgroundColor: 'white',padding:4,elevation:3}} onPress={toggleWishList}>
-              <MaterialCommunityIcons name='heart' size={32} color={wishlisted?"#ED4255":"lightgray"}/>
-              </TouchableOpacity>
-              
-              <TouchableOpacity style={{alignItems:'center',justifyContent:'center',width:40,height:40,borderRadius:20,backgroundColor:'white',padding:4,elevation:3}}>
-              <MaterialCommunityIcons name="share-outline" size={32} color="#3ca98b"/>
-              </TouchableOpacity>
-              
-              <TouchableOpacity style={{alignItems:'center',justifyContent:'center',width:40,height:40,borderRadius:20,backgroundColor:'white',padding:4,elevation:3}}>
-              <MaterialCommunityIcons name="comment-account-outline" size={32} color="#3ca98b"/>
-              </TouchableOpacity>
-              
+                {/* heart, share, comment */}
+                <View style={{ flex: 1, justifyContent: 'space-evenly',marginTop:5}}>
 
-              
+                  <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 20, backgroundColor: 'white', padding: 4, elevation: 3 }} onPress={toggleWishList}>
+                    <MaterialCommunityIcons name='heart' size={24} color={wishlisted ? "#ED4255" : "lightgray"} />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 20, backgroundColor: 'white', padding: 4, elevation: 3 }} onPress={onShare}>
+                    <MaterialCommunityIcons name="share-outline" size={24} color="#3ca98b" />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 20, backgroundColor: 'white', padding: 4, elevation: 3 }}
+                  onPress={()=>setModalVisible(!modalVisible)}
+                  >
+                    <MaterialCommunityIcons name="comment-account-outline" size={24} color="#3ca98b" />
+                  </TouchableOpacity>
+
+                </View>
 
 
               </View>
@@ -158,11 +184,12 @@ const ItemDetails = ({ route }) => {
           >
 
             <TouchableOpacity activeOpacity={0.5} style={styles.addtocartButtonStyle} disabled={!items}
-            onPress={() => {
-              if (items > 0) {
-                setItems(0);
-              }
-            }}
+              onPress={() => {
+                if (items > 0) {
+                  setItems(0);
+                  ToastAndroid.showWithGravity(`${items} ${data.title} has been added to cart`, ToastAndroid.LONG, ToastAndroid.CENTER)
+                }
+              }}
             >
               <Text style={{ ...styles.textStyle, color: '#3ca98b', fontSize: 12, fontWeight: 'normal' }}>Add to cart</Text>
               <TotalPrice style={styles.totalPriceStyle} />
@@ -174,7 +201,10 @@ const ItemDetails = ({ route }) => {
             </TouchableOpacity>
 
           </View>
-        </>
+
+
+
+        </View>
       ) : (<ActivityIndicator />)}
 
     </SafeAreaView>
@@ -247,6 +277,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     width: width,
-    height:50
+    height: 50
   }
 })

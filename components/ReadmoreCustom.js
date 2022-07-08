@@ -25,16 +25,13 @@ const ReadmoreCustom = ({ descriptiveText, numberOfLines, style }) => {
         <View style={styles.scrollStyle}>
             <ScrollView
             showsVerticalScrollIndicator={false}
-            // onScroll={({nativeEvent}) => {
-            //     if (isCloseToBottom(nativeEvent)) {
-            //       // console.log('bottom');
-            //     }
-            //   }}
             >
                 <Text
                     onTextLayout={onTextLayout}
                     numberOfLines={textShown ? undefined : numberOfLines}
                     style={style}
+                    selectable
+                    selectionColor={'#e2f9de'}
                     >{descriptiveText}</Text>
             </ScrollView>
 
