@@ -15,7 +15,7 @@ const AddCommentModal = ({ modalVisible, setModalVisible }) => {
     
     return (
         <Modal
-            animationType="fade"
+            animationType="slide"
             transparent={true}
             visible={modalVisible}
             onRequestClose={() => {
@@ -36,10 +36,9 @@ const AddCommentModal = ({ modalVisible, setModalVisible }) => {
                         placeholder="Type your comment here"
                         placeholderTextColor="#000"
                         multiline={true}
-                        numberOfLines={4}
                         blurOnSubmit
                         ref = {commentTextRef}
-                        autoFocus
+                        onLayout={()=>setTimeout(()=>commentTextRef.current?.focus(),100)}
                         onChangeText={(text)=>{inputText=text}}
                         onSubmitEditing={onSubmit}
                     />
@@ -82,8 +81,8 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 4,
         elevation: 5,
-        borderTopRightRadius:20,
-        borderTopLeftRadius:20,
+        borderTopRightRadius:10,
+        borderTopLeftRadius:10,
         position: 'absolute',
         height: "50%",
         width: '100%',

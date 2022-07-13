@@ -31,8 +31,8 @@ const ItemList = ({ navigation }) => {
   }, []);
 
   async function loadData(){
-    //fetch("https://api.escuelajs.co/api/v1/products") -> another api with larger dataset
-    fetch("https://fakestoreapi.com/products")
+    fetch("https://api.escuelajs.co/api/v1/products")
+    //fetch("https://fakestoreapi.com/products")
       .then((res) => res.json())
       .then((json) => {
         setData(json);
@@ -54,6 +54,8 @@ loadData();
           numColumns={2}
           data={data}
           contentContainerStyle={styles.flatlistStyle}
+          initialNumToRender={10}
+          extraData={data}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -65,27 +67,17 @@ loadData();
               <TouchableOpacity style={styles.itemStyle}
                 onPress={() => navigation.navigate('ItemDetails', { serial: item.id })}
               >
-                <Text style={{ ...styles.textStyle, ...styles.tagStyle }}>
-                  {item.category.toUpperCase()}
-                </Text>
-                <Image source={{ uri: item.image }} style={styles.imageStyle} />
-                <Text style={styles.textStyle} numberOfLines={1}>
+                {/* <Text style={{ ...styles.textStyle, ...styles.tagStyle }}>
+                  {item.category.name.toUpperCase()}
+                </Text> */}
+                <Image source={{ uri: item.category.image }} style={styles.imageStyle} resizeMode={"cover"}/>
+                <Text style={[styles.textStyle,{fontWeight:'bold'}]} numberOfLines={2}>
                   {item.title}
                 </Text>
 
-                <Text style={{ ...styles.textStyle, textAlign: "center" }}>
-                  Price:
-                  <Text
-                    style={{ ...styles.textStyle, fontWeight: "bold" }}
-                    numberOfLines={1}
-                  >
-                    {" "}
-                    {item.price} USD
+                  <Text style={{ ...styles.textStyle}} numberOfLines={1}>
+                    $ {item.price}
                   </Text>
-                </Text>
-
-                <Text numberOfLines={1}>In stock: {item.rating.count} pcs</Text>
-                <Text>⭐ {item.rating.rate}</Text>
               </TouchableOpacity>
             );
           }}
@@ -107,25 +99,29 @@ const styles = StyleSheet.create({
     backgroundColor: "#F5FCFF",
   },
   itemStyle: {
-    margin: PADDING,
+    margin: PADDING*2,
     alignItems: "center",
     borderRadius: 2 * PADDING,
     backgroundColor: "white",
-    padding: PADDING,
+    width: Dimensions.get("window").width / 2.2,
+    height: Dimensions.get("window").height /4,
+    elevation:5,
+    overflow: "hidden",
+
   },
   imageStyle: {
-    width: Dimensions.get("window").width / 2.2,
-    height: Dimensions.get("window").height / 4,
-    resizeMode: "contain",
+    width: '100%',
+    height:"70%",
   },
   textStyle: {
     fontSize: 14,
-    width: Dimensions.get("window").width / 3,
-    alignSelf: 'center'
+    textAlign:'center',
+    alignSelf: 'auto'
   },
   tagStyle: {
     transform: [{ rotateZ: "-90deg" }],
     zIndex: 1,
+    width: Dimensions.get("window").width / 3,
     position: "absolute",
     left: -(Dimensions.get("window").width / 8),
     top: Dimensions.get("window").height / 8,

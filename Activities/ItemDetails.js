@@ -1,21 +1,47 @@
-import { ActivityIndicator, Dimensions, Image, StyleSheet, Text, TouchableOpacity, View, ToastAndroid, Share } from 'react-native'
+import { ActivityIndicator, Dimensions, Image, StyleSheet, Text, TouchableOpacity, View, ToastAndroid, Share, ScrollView } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { LinearGradient } from 'expo-linear-gradient';
 import ReadmoreCustom from '../components/ReadmoreCustom';
 import AddCommentModal from '../components/AddCommentModal';
 
+import Animated, { useSharedValue, useAnimatedStyle, interpolate, useAnimatedScrollHandler, runOnUI, runOnJS, useDerivedValue, Extrapolate } from 'react-native-reanimated';
+
+
 const { width, height } = Dimensions.get('window');
 
 const ItemDetails = ({ route }) => {
   const { serial } = route.params;
+  // states
   const [items, setItems] = useState(0);
   const [data, setData] = useState(null);
   const [wishlisted, setWishlisted] = useState(false);
   const [cartButtonHeight, setCartButtonHeight] = useState(0);
-  const [modalVisible,setModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [imageIndex, setImageIndex] = useState(0);
 
+  // refs
+  const scrollViewImageRef = useRef();
+
+  // reanimated shared values
+  const scrollX = useSharedValue(0);
+  //const opacityValue = useSharedValue(0);
+
+  //let imageIndex = 0;
+  // reanimated styles
+   //const index = Math.round(scrollX.value/width);
+  const backgroundImageAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(scrollX.value, [( Math.round(scrollX.value/width) - 1) * width, Math.round(scrollX.value/width) * width, (Math.round(scrollX.value/width) + 1) * width], [0, 1, 0]),
+  })
+  )
+  const mainImageStyle = useAnimatedStyle(() => ({
+    transform: [
+      {
+        scale: interpolate(scrollX.value, [(Math.round(scrollX.value/width) - 1) * width, Math.round(scrollX.value/width) * width, (Math.round(scrollX.value/width) + 1) * width], [0.8, 1, 0.8]),
+      }
+    ]
+  }))
 
   const toggleWishList = () => { //To toggle the show text or hide it
     !wishlisted ? ToastAndroid.showWithGravity(
@@ -34,9 +60,11 @@ const ItemDetails = ({ route }) => {
 
 
   useEffect(() => {
-    fetch(`https://fakestoreapi.com/products/${serial}`).then(res => res.json()).then(json => {
-      setData(json);
-    }).catch(err => { alert(`Could not load data: ${err}`) });
+    //fetch(`https://fakestoreapi.com/products/${serial}`)
+    fetch(`https://api.escuelajs.co/api/v1/products/${serial}`)
+      .then(res => res.json()).then(json => {
+        setData(json);
+      }).catch(err => { alert(`Could not load data: ${err}`) });
   }, [])
 
 
@@ -50,8 +78,7 @@ const ItemDetails = ({ route }) => {
   const onShare = async () => {
     try {
       const result = await Share.share({
-        message: `${data.title} | $ ${data.price} | ${data.category.toUpperCase()}`,
-        url: data.image,
+        message: `${data.title} | $ ${data.price} | ${data.category.name}`,
       });
       if (result.action === Share.sharedAction) {
         if (result.activityType) {
@@ -67,26 +94,83 @@ const ItemDetails = ({ route }) => {
     }
   };
 
+  const onGotoIndex = ({ index }) => {
+    scrollViewImageRef.current?.scrollTo({ x: index * width, y: 0, animated: true });
+  }
+  const onScrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      
+      scrollX.value = event.contentOffset.x;
+      runOnJS(setImageIndex)(Math.round(event.contentOffset.x / width));
+    },
+  }, [])
 
   return (
     <SafeAreaView style={styles.container}>
 
-
-
       {data ? (
         <View>
-          <AddCommentModal modalVisible={modalVisible} setModalVisible={setModalVisible}/>
-          {/* Top image and wishlist components */}
-          <View style={{ width: width, alignItems: 'center' }}>
-            {/* top image */}
-            <View style={styles.imageStyle}>
-              <Image source={{ uri: data.image }} style={{ ...StyleSheet.absoluteFillObject, marginBottom: 10 }} resizeMode={'contain'} />
-            </View>
-            {/* Wishlist button */}
+          <AddCommentModal modalVisible={modalVisible} setModalVisible={setModalVisible} />
+          {/* Top elemesnts*/}
+          <View style={{ width: width, height: height * 0.4 }}>
+
+      <Animated.Image source={{ uri: data.images[imageIndex] }} style={[StyleSheet.absoluteFillObject,backgroundImageAnimatedStyle]}
+        blurRadius={20}
+      />
+  
+            <Animated.ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} ref={scrollViewImageRef} onScroll={onScrollHandler}>
+              {/* scrollview item */}
+              {
+              data.images.map((image, index) => (
+                <Animated.View style={[{ width: width, alignItems: 'center', justifyContent: 'center' },mainImageStyle]} key={index}>
+                  {/* Top iamge and background with slider */}
+
+
+                  <View
+                    style={styles.imageStyle}>
+                    {/* Background Image */}
+                    <Animated.Image source={{ uri: image }}
+                      style={{
+
+                        width: width - 40,
+                        height: height * 0.4 - 40,
+                        borderRadius: 10,
+                      }}
+                      resizeMode={'contain'}
+                    />
+
+                  </View>
+
+                </Animated.View>
+              ))}
+
+            </Animated.ScrollView>
+            {/* Linear Gradient */}
             <LinearGradient
               colors={['transparent', 'rgba(0,0,0,0.2)']}
               style={styles.linearGradient}
-            />
+            >
+              <ScrollView horizontal contentContainerStyle={{ alignItems: 'flex-end', marginBottom: 5 }}>
+                {
+                  data.images.map((_, index) => (
+                    <TouchableOpacity activeOpacity={1} key={index} style={{
+                      height: 10,
+                      width: 10,
+                      borderRadius: 5,
+                      backgroundColor: imageIndex === index ? 'white' : 'gray',
+                      marginHorizontal: 10,
+                      transform: [
+                        { scale: imageIndex === index ? 1 : 0.8 }
+                      ]
+                    }}
+                      onPress={() => onGotoIndex({ index })} />
+                  )
+                  )
+
+                }
+
+              </ScrollView>
+            </LinearGradient>
           </View>
 
 
@@ -99,12 +183,12 @@ const ItemDetails = ({ route }) => {
 
             <View style={styles.extraInfoStyle}>
               <Text style={{ ...styles.textStyle, fontWeight: 'normal', fontSize: 14 }}>
-                {data.category.toUpperCase()}
+                {data.category.name}
               </Text>
               <Text style={{ marginHorizontal: 5 }}>•</Text>
               <MaterialCommunityIcons name="star" size={20} color="#F8ED62" />
               <Text style={{ ...styles.textStyle, fontWeight: 'normal', fontSize: 14 }}>
-                {data.rating.rate}({data.rating.count})
+                4.4(200)
               </Text>
               <Text style={{ marginHorizontal: 5 }}>•</Text>
               <Text style={{ ...styles.textStyle, fontWeight: 'bold', fontSize: 14 }}>
@@ -136,7 +220,7 @@ const ItemDetails = ({ route }) => {
                   >
                     <MaterialCommunityIcons name="plus" size={32} color="#3ca98b" />
                   </TouchableOpacity>
-                  <Text style={{ fontWeight: 'bold', fontSize: 24, color: '#18866C'}}>
+                  <Text style={{ fontWeight: 'bold', fontSize: 24, color: '#18866C' }}>
                     {items}
                   </Text>
                   <TouchableOpacity style={{ alignItems: 'center', borderRadius: 5, backgroundColor: 'white', margin: 2 }}
@@ -149,7 +233,7 @@ const ItemDetails = ({ route }) => {
                 </View>
 
                 {/* heart, share, comment */}
-                <View style={{ flex: 1, justifyContent: 'space-evenly',marginTop:5}}>
+                <View style={{ flex: 1, justifyContent: 'space-around', marginTop: 5 }}>
 
                   <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 20, backgroundColor: 'white', padding: 4, elevation: 3 }} onPress={toggleWishList}>
                     <MaterialCommunityIcons name='heart' size={24} color={wishlisted ? "#ED4255" : "lightgray"} />
@@ -160,7 +244,7 @@ const ItemDetails = ({ route }) => {
                   </TouchableOpacity>
 
                   <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 20, backgroundColor: 'white', padding: 4, elevation: 3 }}
-                  onPress={()=>setModalVisible(!modalVisible)}
+                    onPress={() => setModalVisible(!modalVisible)}
                   >
                     <MaterialCommunityIcons name="comment-account-outline" size={24} color="#3ca98b" />
                   </TouchableOpacity>
@@ -221,8 +305,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   imageStyle: {
-    width: width * 0.8,
-    height: height * 0.4,
+    borderRadius: 10,
+    elevation: 10,
   },
   bottomSheetStyle: {
     flex: 1,
@@ -230,7 +314,7 @@ const styles = StyleSheet.create({
     padding: 10
   },
   textStyle: {
-    fontWeight: 'bold',
+    fontWeight: '800',
     fontSize: 20,
     color: 'black'
   },
@@ -273,7 +357,6 @@ const styles = StyleSheet.create({
   },
   linearGradient: {
     alignItems: 'center',
-    justifyContent: 'space-evenly',
     position: 'absolute',
     bottom: 0,
     width: width,
