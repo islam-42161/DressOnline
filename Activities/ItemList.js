@@ -31,11 +31,12 @@ const ItemList = ({ navigation }) => {
   }, []);
 
   async function loadData(){
-    fetch("https://api.escuelajs.co/api/v1/products")
     //fetch("https://fakestoreapi.com/products")
+    // fetch("https://api.escuelajs.co/api/v1/products")
+    fetch("https://dummyjson.com/products")
       .then((res) => res.json())
       .then((json) => {
-        setData(json);
+        setData(json.products);
       });
   }
 
@@ -70,7 +71,7 @@ loadData();
                 {/* <Text style={{ ...styles.textStyle, ...styles.tagStyle }}>
                   {item.category.name.toUpperCase()}
                 </Text> */}
-                <Image source={{ uri: item.category.image }} style={styles.imageStyle} resizeMode={"cover"}/>
+                <Image source={{ uri: item.thumbnail }} style={styles.imageStyle}/>
                 <Text style={[styles.textStyle,{fontWeight:'bold'}]} numberOfLines={2}>
                   {item.title}
                 </Text>
