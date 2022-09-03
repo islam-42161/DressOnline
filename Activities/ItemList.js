@@ -81,7 +81,7 @@ const ItemList = ({ navigation }) => {
                   }
                 </View>
                 {/* bottom part */}
-                <View style={{padding:10,flex:1}}>
+                <View style={{padding:5,flex:1}}>
                 <Text style={[styles.textStyle, { fontWeight: 'bold',fontFamily:'sans-serif-condensed',fontSize:14,textTransform:'uppercase'}]} numberOfLines={2} adjustsFontSizeToFit>
                   {item.title}
                 </Text>
@@ -93,20 +93,26 @@ const ItemList = ({ navigation }) => {
                   <Text style={{fontFamily:'sans-serif-condensed'}} adjustsFontSizeToFit numberOfLines={1}>⭐{item.rating}</Text>
                 </View>
 
-
-                <View style={{width:'100%',flexDirection:'row',justifyContent:'space-evenly'}}>
-                  <Text style={{fontFamily:'sans-serif-condensed'}}>Price:</Text>
-                <Text style={{ ...styles.textStyle,color:'tomato',fontWeight:'bold',letterSpacing:1,fontFamily:'sans-serif-condensed'}} numberOfLines={1} adjustsFontSizeToFit>
-                ${item.price-(item.price * (item.discountPercentage/100)).toFixed(0)}
-                  
-                </Text>
-                <Text style={{ ...styles.textStyle,color:'green',fontFamily:'sans-serif-condensed'}} numberOfLines={1} adjustsFontSizeToFit>
-                  (-{item.discountPercentage}%)
-                </Text>
-                <Text style={{ ...styles.textStyle,color:'gray',fontWeight:'400',textDecorationLine:'line-through',fontFamily:'sans-serif-condensed'}} numberOfLines={1} adjustsFontSizeToFit>
+{/* price section */}
+                <Text style={{flexDirection:'row',justifyContent:'space-between'}} adjustsFontSizeToFit numberOfLines={1}>
+                  {/* <Text style={{fontFamily:'sans-serif-condensed'}}>Price:</Text> */}
+                
+                
+                  <Text style={{ ...styles.textStyle,color:'gray',fontWeight:'400',textDecorationLine:'line-through',fontFamily:'sans-serif-condensed'}} >
                 ${item.price}
                 </Text>
-                </View>
+
+                  <Text style={{ ...styles.textStyle,color:'green',fontFamily:'sans-serif-condensed'}} >
+                  (-{item.discountPercentage}%)
+                </Text>
+                
+
+                <Text style={{ ...styles.textStyle,color:'tomato',fontWeight:'bold',letterSpacing:1,fontFamily:'sans-serif-condensed'}} >
+                ${item.price-(item.price * (item.discountPercentage/100)).toFixed(0)}
+                </Text>
+                
+                </Text>
+                
                 </View>
                 </View>
                 <View style={{width:'100%',backgroundColor:'black'}}>
