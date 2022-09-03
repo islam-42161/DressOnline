@@ -10,7 +10,7 @@ import {
   ToastAndroid,
   Share,
   ScrollView,
-  Animated
+
 } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React, { useEffect, useRef, useState } from 'react'
@@ -18,6 +18,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { LinearGradient } from 'expo-linear-gradient';
 import ReadmoreCustom from '../components/ReadmoreCustom';
 import AddCommentModal from '../components/AddCommentModal';
+import Animated, { event, Extrapolate, interpolate, interpolateColor, useAnimatedScrollHandler, useAnimatedStyle, useDerivedValue, useSharedValue, withTiming } from 'react-native-reanimated';
 
 
 
@@ -116,21 +117,106 @@ const ItemDetails = ({ route }) => {
 
 
 
-  const onScroll = () => (
-      Animated.event(         
-        [{ nativeEvent: {
-             contentOffset: {
-               x: scrollX
-             }
-           }
-         }],
-        { useNativeDriver: true }
-      ));
+  const animatedScrollX = useSharedValue(0);
+  const animatedScrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+        animatedScrollX.value = event.contentOffset.x;
+        console.log(animatedScrollX.value)
+    }
+})
   
       const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
+      const AnimatedBackImage = ({ index, image }) => {
+        const ImageStyle = useAnimatedStyle(() => {
+            const opacity = interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [0, 1, 0], Extrapolate.CLAMP)
+            return {
+                opacity: opacity
+            }
+        })
+        return (
+            <Animated.View key={index} style={[StyleSheet.absoluteFillObject, ImageStyle]}>
+                <Image
+                    source={{ uri: image }}
+                    style={StyleSheet.absoluteFillObject}
+                    blurRadius={10}
+
+                />
+            </Animated.View>
+        )
+    }
+
+    const MainImage = ({ image, index }) => {
+        const ImageStyle = useAnimatedStyle(() => {
+            const scale = interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [0.7, 1, 0.7], Extrapolate.CLAMP)
+            return {
+                transform: [
+                    {
+                        scale
+                    }
+                ]
+            }
+        })
+        return (
+          <Animated.View style={[{ width: width, alignItems: 'center', justifyContent: 'center' }, ImageStyle]}>
+            {/* Top iamge and background with slider */}
+
+            <View
+              style={styles.imageContainer}>
+              {/* Background Image */}
+              <Image source={{ uri: image }}
+                style={{
+                  width: width - 40,
+                  height: height * 0.4 - 40,
+                  borderRadius: 10,
+                }}
+                resizeMode={'contain'}
+              />
+
+            </View>
+
+          </Animated.View>
+        )
+    }
+
+    const Dot = ({ index }) => {
+
+      const dotStyle = useAnimatedStyle(() => {
+          const scale = interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [0.7, 1, 0.7], Extrapolate.CLAMP)
+          const elevate = withTiming(interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [0, 10, 0], Extrapolate.CLAMP))
+          const translateY = withTiming(interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [0, -1, 0], Extrapolate.CLAMP))
+          const color = interpolateColor(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], ['rgba(255,255,255,0.5)', 'rgba(255,255,255,1)', 'rgba(255,255,255,0.5)'])
+          return {
+              transform: [
+                  {
+                      scaleX: scale
+                  },
+                  {
+                      translateY: translateY
+                  }
+              ],
+              elevation: elevate,
+              backgroundColor: color
+          }
+      })
 
 
+      return (
+<AnimatedTouchable activeOpacity={1} 
+          index={index}
+          style={[{
+                      height: 10,
+                      width: 20,
+                      borderRadius: 5,
+                      backgroundColor: 'white',
+                      marginHorizontal: 10,
+                    },
+                    dotStyle
+                  ]}
+                      onPress={() => onGotoIndex({ index })} 
+                      />
+      )
+  }
 
 
   return (
@@ -143,66 +229,30 @@ const ItemDetails = ({ route }) => {
           <View style={{ 
             width: width,
             height: height * 0.4,
-            borderBottomLeftRadius:10,
-            borderBottomRightRadius:10,
+            borderBottomLeftRadius:20,
+            borderBottomRightRadius:20,
             overflow:"hidden"
           }}
             >
 
             {
               data.images.map((image, index) => {
-                const inputRange = [(index-1)*width, (index)*width, (index+1)*width];
-                const opacity = scrollX.interpolate({
-                    inputRange,
-                    outputRange: [0, 1, 0],
-                },
-                )
+                
 
                 return (
-                  <Animated.Image source={{ uri: image }} key={index} style={[StyleSheet.absoluteFillObject,{
-                    opacity: opacity,
-                  }]}
-                    blurRadius={20}
-                  />
+                  <AnimatedBackImage image={image} key={index} index={index}/>
                 )
 
               })}
-            <Animated.ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} ref={scrollViewImageRef}  onScroll={onScroll()}>
+            <Animated.ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} ref={scrollViewImageRef}  onScroll={animatedScrollHandler}>
               {/* scrollview item */}
 
               {
                 data.images.map((image, index) => {
                   imageIndex.setValue(index);
-                  const inputRange = [(index -1 )*width, (index)*width, (index+1)*width];
-                  const scale = scrollX.interpolate({
-                      inputRange,
-                      outputRange: [0.7, 1, 0.7],
-                  })
+                  
                   return(
-                    <Animated.View style={[{ width: width, alignItems: 'center', justifyContent: 'center' }, {
-                      transform:[
-                        {
-                          scale: scale
-                        }
-                      ]
-                    }]} key={index}>
-                      {/* Top iamge and background with slider */}
-  
-                      <View
-                        style={styles.imageContainer}>
-                        {/* Background Image */}
-                        <Image source={{ uri: image }}
-                          style={{
-                            width: width - 40,
-                            height: height * 0.4 - 40,
-                            borderRadius: 10,
-                          }}
-                          resizeMode={'contain'}
-                        />
-  
-                      </View>
-  
-                    </Animated.View>
+                    <MainImage image={image} key={index} index={index}/>
                   )
                 })}
 
@@ -215,29 +265,7 @@ const ItemDetails = ({ route }) => {
               <ScrollView horizontal contentContainerStyle={{ alignItems: 'flex-end', marginBottom: 5 }}>
                 {
                   data.images.map((_, index) => (
-                    <AnimatedTouchable activeOpacity={1} key={index} style={[{
-                      height: 10,
-                      width: 20,
-                      borderRadius: 5,
-                      backgroundColor: 'white',
-                      marginHorizontal: 10,
-                    },
-                    {
-                      transform:[
-                        {
-                          scale: scrollX.interpolate(
-                            {
-                              inputRange: [(index - 1)*width, index*width , (index + 1)*width],
-                              outputRange: [0.5, 1, 0.5],
-                              extrapolate:'clamp'
-                            }
-                          ),
-                        }
-                      ],
-                    }
-                  ]}
-                      onPress={() => onGotoIndex({ index })} 
-                      />
+                    <Dot key={index} index={index}/>
                   )
                   )
 

@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   StatusBar as SB,
   RefreshControl,
+  View
 } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -21,7 +22,7 @@ const wait = (timeout) => {
 
 const ItemList = ({ navigation }) => {
   const [data, setData] = useState([]);
-  const [refreshing,setRefreshing] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     wait(2000).then(() => {
@@ -30,7 +31,7 @@ const ItemList = ({ navigation }) => {
     });
   }, []);
 
-  async function loadData(){
+  async function loadData() {
     //fetch("https://fakestoreapi.com/products")
     // fetch("https://api.escuelajs.co/api/v1/products")
     fetch("https://dummyjson.com/products")
@@ -41,15 +42,15 @@ const ItemList = ({ navigation }) => {
   }
 
   useEffect(() => {
-loadData();
+    loadData();
   }, []);
 
 
   return (
-    
+
     <SafeAreaView style={styles.container}>
       {data.length === 0 ? (
-          <ActivityIndicator />
+        <ActivityIndicator />
       ) : (
         <FlatList
           numColumns={2}
@@ -71,14 +72,46 @@ loadData();
                 {/* <Text style={{ ...styles.textStyle, ...styles.tagStyle }}>
                   {item.category.name.toUpperCase()}
                 </Text> */}
-                <Image source={{ uri: item.thumbnail }} style={styles.imageStyle}/>
-                <Text style={[styles.textStyle,{fontWeight:'bold'}]} numberOfLines={2}>
+                <View style={styles.imageContainer}>
+                  <Image source={{ uri: item.thumbnail }} style={styles.imageStyle} />
+                  {item.stock > 0 ? (
+                    <Text style={{ position: 'absolute', bottom: 5, right: 5, backgroundColor: 'rgba(0,200,0,0.7)', color: "white", fontWeight: '700', fontSize: 10, paddingVertical: 2, paddingHorizontal: 4, borderRadius: 2, fontFamily:'sans-serif-condensed' }}>Available: {item.stock}</Text>
+                  ) : (
+                    <Text style={{ position: 'absolute', bottom: 5, right: 5, backgroundColor: 'rgba(200,0,0,0.7)', color: "white", fontWeight: '700', fontSize: 10, paddingVertical: 2, paddingHorizontal: 4, borderRadius: 2, fontFamily:'sans-serif-condensed' }}>Not Available</Text>)
+                  }
+                </View>
+                {/* bottom part */}
+                <View style={{padding:10,flex:1}}>
+                <Text style={[styles.textStyle, { fontWeight: 'bold',fontFamily:'sans-serif-condensed',fontSize:14,textTransform:'uppercase'}]} numberOfLines={2} adjustsFontSizeToFit>
                   {item.title}
                 </Text>
 
-                  <Text style={{ ...styles.textStyle}} numberOfLines={1}>
-                    $ {item.price}
-                  </Text>
+                {/* brand, rating, price section */}
+                <View style={{justifyContent:'center',flex:1}}>
+                <View style={{flexDirection:'row',justifyContent:'space-between', alignItems:'center'}}>
+                  <Text style={{fontFamily:'sans-serif-condensed',flex:1,textTransform:'capitalize'}} adjustsFontSizeToFit numberOfLines={1}>{item.brand}</Text>
+                  <Text style={{fontFamily:'sans-serif-condensed'}} adjustsFontSizeToFit numberOfLines={1}>⭐{item.rating}</Text>
+                </View>
+
+
+                <View style={{width:'100%',flexDirection:'row',justifyContent:'space-evenly'}}>
+                  <Text style={{fontFamily:'sans-serif-condensed'}}>Price:</Text>
+                <Text style={{ ...styles.textStyle,color:'tomato',fontWeight:'bold',letterSpacing:1,fontFamily:'sans-serif-condensed'}} numberOfLines={1} adjustsFontSizeToFit>
+                ${item.price-(item.price * (item.discountPercentage/100)).toFixed(0)}
+                  
+                </Text>
+                <Text style={{ ...styles.textStyle,color:'green',fontFamily:'sans-serif-condensed'}} numberOfLines={1} adjustsFontSizeToFit>
+                  (-{item.discountPercentage}%)
+                </Text>
+                <Text style={{ ...styles.textStyle,color:'gray',fontWeight:'400',textDecorationLine:'line-through',fontFamily:'sans-serif-condensed'}} numberOfLines={1} adjustsFontSizeToFit>
+                ${item.price}
+                </Text>
+                </View>
+                </View>
+                </View>
+                <View style={{width:'100%',backgroundColor:'black'}}>
+<Text style={{color:'white',textTransform:'uppercase',textAlign:'center',fontWeight:'800'}}>{item.category}</Text>
+</View>
               </TouchableOpacity>
             );
           }}
@@ -99,24 +132,30 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#F5FCFF",
   },
+  imageContainer: {
+    width: '100%',
+    height: Dimensions.get("window").height / 6,
+
+  },
   itemStyle: {
-    margin: PADDING*2,
+    margin: PADDING * 2,
     alignItems: "center",
     borderRadius: 2 * PADDING,
     backgroundColor: "white",
     width: Dimensions.get("window").width / 2.2,
-    height: Dimensions.get("window").height /4,
-    elevation:5,
+    
+    elevation: 5,
     overflow: "hidden",
 
   },
   imageStyle: {
-    width: '100%',
-    height:"70%",
+    height: "100%",
+    width: "100%",
+    resizeMode: "cover",
   },
   textStyle: {
     fontSize: 14,
-    textAlign:'center',
+    textAlign: 'center',
     alignSelf: 'auto'
   },
   tagStyle: {
