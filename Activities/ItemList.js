@@ -81,42 +81,51 @@ const ItemList = ({ navigation }) => {
                   }
                 </View>
                 {/* bottom part */}
-                <View style={{padding:5,flex:1}}>
+                <View style={{padding:10,flex:1,width:"100%"}}>
                 <Text style={[styles.textStyle, { fontWeight: 'bold',fontFamily:'sans-serif-condensed',fontSize:14,textTransform:'uppercase'}]} numberOfLines={2} adjustsFontSizeToFit>
                   {item.title}
                 </Text>
 
                 {/* brand, rating, price section */}
-                <View style={{justifyContent:'center',flex:1}}>
+                <View style={{justifyContent:'center',flex:1,width:"100%",alignItems:'center'}}>
                 <View style={{flexDirection:'row',justifyContent:'space-between', alignItems:'center'}}>
-                  <Text style={{fontFamily:'sans-serif-condensed',flex:1,textTransform:'capitalize'}} adjustsFontSizeToFit numberOfLines={1}>{item.brand}</Text>
-                  <Text style={{fontFamily:'sans-serif-condensed'}} adjustsFontSizeToFit numberOfLines={1}>⭐{item.rating}</Text>
+                  <Text style={{fontFamily:'sans-serif-condensed',flex:1,textTransform:'capitalize'}} numberOfLines={1} adjustsFontSizeToFit >{item.brand}</Text>
+                  <Text style={{fontFamily:'sans-serif-condensed'}} >⭐{item.rating}</Text>
                 </View>
 
 {/* price section */}
-                <Text style={{flexDirection:'row',justifyContent:'space-between'}} adjustsFontSizeToFit numberOfLines={1}>
-                  {/* <Text style={{fontFamily:'sans-serif-condensed'}}>Price:</Text> */}
+
+
+
+<View style={{flexDirection:'row',width:"100%",alignItems:'center'}}>
+                  <Text style={{fontFamily:'sans-serif-condensed'}} adjustsFontSizeToFit numberOfLines={1} >Price:</Text>
+
+
+                <View style={{justifyContent:'space-between',flexDirection:'row',alignItems:'center',flex:1,marginLeft:5}} >
                 
                 
-                  <Text style={{ ...styles.textStyle,color:'gray',fontWeight:'400',textDecorationLine:'line-through',fontFamily:'sans-serif-condensed'}} >
+                  <Text style={{ ...styles.textStyle,color:'gray',fontWeight:'400',textDecorationLine:'line-through',fontFamily:'sans-serif-condensed'}} adjustsFontSizeToFit numberOfLines={1}>
                 ${item.price}
                 </Text>
 
-                  <Text style={{ ...styles.textStyle,color:'green',fontFamily:'sans-serif-condensed'}} >
+                  <Text style={{ ...styles.textStyle,color:'green',fontFamily:'sans-serif-condensed',marginHorizontal:5}} adjustsFontSizeToFit numberOfLines={1} >
                   (-{item.discountPercentage}%)
                 </Text>
                 
 
-                <Text style={{ ...styles.textStyle,color:'tomato',fontWeight:'bold',letterSpacing:1,fontFamily:'sans-serif-condensed'}} >
+                <Text style={{ ...styles.textStyle,color:'tomato',fontWeight:'bold',letterSpacing:1,fontFamily:'sans-serif-condensed'}} adjustsFontSizeToFit numberOfLines={1} >
                 ${item.price-(item.price * (item.discountPercentage/100)).toFixed(0)}
                 </Text>
                 
-                </Text>
+                </View>
+
+
+                </View>
                 
                 </View>
                 </View>
-                <View style={{width:'100%',backgroundColor:'black'}}>
-<Text style={{color:'white',textTransform:'uppercase',textAlign:'center',fontWeight:'800'}}>{item.category}</Text>
+                <View style={{width:'100%',backgroundColor:'black',bottom:-1}}>
+<Text style={{color:'white',textTransform:'uppercase',textAlign:'center',fontWeight:'800',marginBottom:1}}>{item.category}</Text>
 </View>
               </TouchableOpacity>
             );
