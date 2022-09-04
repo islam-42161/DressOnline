@@ -75,22 +75,22 @@ const ItemList = ({ navigation }) => {
                 <View style={styles.imageContainer}>
                   <Image source={{ uri: item.thumbnail }} style={styles.imageStyle} />
                   {item.stock > 0 ? (
-                    <Text style={{ position: 'absolute', bottom: 5, right: 5, backgroundColor: 'rgba(0,200,0,0.7)', color: "white", fontWeight: '700', fontSize: 10, paddingVertical: 2, paddingHorizontal: 4, borderRadius: 2, fontFamily:'sans-serif-condensed' }}>Available: {item.stock}</Text>
+                    <Text style={{ position: 'absolute', bottom: 5, right: 5, backgroundColor: 'rgba(0,200,0,0.7)', color: "white", fontWeight: '700', fontSize: 10, paddingVertical: 2, paddingHorizontal: 4, borderRadius: 2, ...styles.textStyle }}>Available: {item.stock}</Text>
                   ) : (
-                    <Text style={{ position: 'absolute', bottom: 5, right: 5, backgroundColor: 'rgba(200,0,0,0.7)', color: "white", fontWeight: '700', fontSize: 10, paddingVertical: 2, paddingHorizontal: 4, borderRadius: 2, fontFamily:'sans-serif-condensed' }}>Not Available</Text>)
+                    <Text style={{ position: 'absolute', bottom: 5, right: 5, backgroundColor: 'rgba(200,0,0,0.7)', color: "white", fontWeight: '700', fontSize: 10, paddingVertical: 2, paddingHorizontal: 4, borderRadius: 2, ...styles.textStyle }}>Not Available</Text>)
                   }
                 </View>
                 {/* bottom part */}
                 <View style={{padding:10,flex:1,width:"100%"}}>
-                <Text style={[styles.textStyle, { fontWeight: 'bold',fontFamily:'sans-serif-condensed',fontSize:14,textTransform:'uppercase'}]} numberOfLines={2} adjustsFontSizeToFit>
+                <Text style={[styles.textStyle, { fontWeight: 'bold',...styles.textStyle,fontSize:14,textTransform:'uppercase'}]} numberOfLines={2} adjustsFontSizeToFit>
                   {item.title}
                 </Text>
 
                 {/* brand, rating, price section */}
                 <View style={{justifyContent:'center',flex:1,width:"100%",alignItems:'center'}}>
                 <View style={{flexDirection:'row',justifyContent:'space-between', alignItems:'center'}}>
-                  <Text style={{fontFamily:'sans-serif-condensed',flex:1,textTransform:'capitalize'}} numberOfLines={1} adjustsFontSizeToFit >{item.brand}</Text>
-                  <Text style={{fontFamily:'sans-serif-condensed'}} >⭐{item.rating}</Text>
+                  <Text style={{...styles.textStyle,flex:1,textTransform:'capitalize'}} numberOfLines={1} adjustsFontSizeToFit >{item.brand}</Text>
+                  <Text style={{...styles.textStyle}} >⭐{item.rating}</Text>
                 </View>
 
 {/* price section */}
@@ -100,25 +100,27 @@ const ItemList = ({ navigation }) => {
 <View style={{flexDirection:'row',justifyContent:'space-between',width:"100%",alignItems:'center'}}>
 
 
-                  <Text style={{fontFamily:'sans-serif-condensed'}}>Price:</Text>
-                <Text style={{alignItems:'center'}} adjustsFontSizeToFit numberOfLines={1}  >
+                  <Text style={{...styles.textStyle}} >Price: </Text>
+                  <View style={{flex:1,flexDirection:'row',alignItems:'center',justifyContent:'flex-end'}} >
+                <Text style={{...styles.textStyle}} adjustsFontSizeToFit numberOfLines={1}>
                 
                 
-                  <Text style={{ ...styles.textStyle,color:'gray',fontWeight:'400',textDecorationLine:'line-through',fontFamily:'sans-serif-condensed'}}>
+                  <Text style={{ color:'gray',fontWeight:'400',textDecorationLine:'line-through'}} >
                 ${item.price}
                 </Text>
 {" "}
-                  <Text style={{ ...styles.textStyle,color:'green',fontFamily:'sans-serif-condensed'}} >
+                  <Text style={{ color:'green',...styles.textStyle}} >
                   (-{item.discountPercentage}%)
                 </Text>
                 
 {" "}
-                <Text style={{ ...styles.textStyle,color:'tomato',fontWeight:'bold',letterSpacing:1,fontFamily:'sans-serif-condensed'}} >
+                <Text style={{ color:'tomato',fontWeight:'bold',letterSpacing:1,...styles.textStyle}} >
                 ${item.price-(item.price * (item.discountPercentage/100)).toFixed(0)}
                 </Text>
                 
                 </Text>
 
+                </View>
 
                 </View>
                 
@@ -169,9 +171,7 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   textStyle: {
-    fontSize: 14,
-    textAlign: 'center',
-    alignSelf: 'auto'
+    fontFamily:'sans-serif-condensed'
   },
   tagStyle: {
     transform: [{ rotateZ: "-90deg" }],
