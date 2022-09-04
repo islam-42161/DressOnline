@@ -97,27 +97,27 @@ const ItemList = ({ navigation }) => {
 
 
 
-<View style={{flexDirection:'row',width:"100%",alignItems:'center'}}>
-                  <Text style={{fontFamily:'sans-serif-condensed'}} adjustsFontSizeToFit numberOfLines={1} >Price:</Text>
+<View style={{flexDirection:'row',justifyContent:'space-between',width:"100%",alignItems:'center'}}>
 
 
-                <View style={{justifyContent:'space-between',flexDirection:'row',alignItems:'center',flex:1,marginLeft:5}} >
+                  <Text style={{fontFamily:'sans-serif-condensed'}}>Price:</Text>
+                <Text style={{alignItems:'center'}} adjustsFontSizeToFit numberOfLines={1}  >
                 
                 
-                  <Text style={{ ...styles.textStyle,color:'gray',fontWeight:'400',textDecorationLine:'line-through',fontFamily:'sans-serif-condensed'}} adjustsFontSizeToFit numberOfLines={1}>
+                  <Text style={{ ...styles.textStyle,color:'gray',fontWeight:'400',textDecorationLine:'line-through',fontFamily:'sans-serif-condensed'}}>
                 ${item.price}
                 </Text>
-
-                  <Text style={{ ...styles.textStyle,color:'green',fontFamily:'sans-serif-condensed',marginHorizontal:5}} adjustsFontSizeToFit numberOfLines={1} >
+{" "}
+                  <Text style={{ ...styles.textStyle,color:'green',fontFamily:'sans-serif-condensed'}} >
                   (-{item.discountPercentage}%)
                 </Text>
                 
-
-                <Text style={{ ...styles.textStyle,color:'tomato',fontWeight:'bold',letterSpacing:1,fontFamily:'sans-serif-condensed'}} adjustsFontSizeToFit numberOfLines={1} >
+{" "}
+                <Text style={{ ...styles.textStyle,color:'tomato',fontWeight:'bold',letterSpacing:1,fontFamily:'sans-serif-condensed'}} >
                 ${item.price-(item.price * (item.discountPercentage/100)).toFixed(0)}
                 </Text>
                 
-                </View>
+                </Text>
 
 
                 </View>
