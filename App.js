@@ -11,7 +11,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons';
 import Home from './Activities/Home';
 import Settings from './Activities/Settings';
-import ImageOpacity from './Activities/ImageOpacity';
+import Test from './Activities/Test';
 const Screen = createBottomTabNavigator().Screen;
 const Navigator = createBottomTabNavigator().Navigator;
 
@@ -32,10 +32,10 @@ const App = () => {
                   } else if (route.name === 'Settings') {
                     iconName = focused ? 'ios-settings' : 'ios-settings-outline';
                   }
-                  else if (route.name === 'Image') {
-                    iconName = focused ? 'ios-image' : 'ios-image-outline';
+                  else if (route.name === 'Test') {
+                    iconName = focused ? 'ios-eye' : 'ios-eye-outline';
                   }
-      
+                  
                   // You can return any component that you like here!
                   return <Ionicons name={iconName} size={size} color={color} />;
                 },
@@ -50,7 +50,8 @@ const App = () => {
       >
         <Screen name="Home" component={Home} options={{ tabBarBadge: null }}/>
         <Screen name='Settings' component={Settings} options={{ tabBarBadge: null }}/>
-        <Screen name='Image' component={ImageOpacity} options={{ tabBarBadge: null }}/>
+        <Screen name='Test' component={Test} options={{ tabBarBadge: null }}/>
+        
       </Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>
