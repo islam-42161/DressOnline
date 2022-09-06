@@ -6,7 +6,7 @@
     "assetBundlePatterns": [
       "**/*"
     ],
-    "description": "a little more change in refresh and search",
+    "description": "changed price section in item details and changed text font family",
     "githubUrl": "https://github.com/islam-42161/DressOnline"
   },
   "name": "DressOnline"

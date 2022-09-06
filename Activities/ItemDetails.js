@@ -18,7 +18,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { LinearGradient } from 'expo-linear-gradient';
 import ReadmoreCustom from '../components/ReadmoreCustom';
 import AddCommentModal from '../components/AddCommentModal';
-import Animated, { event, Extrapolate, interpolate, interpolateColor, useAnimatedScrollHandler, useAnimatedStyle, useDerivedValue, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, { concat, event, Extrapolate, interpolate, interpolateColor, useAnimatedScrollHandler, useAnimatedStyle, useDerivedValue, useSharedValue, withTiming } from 'react-native-reanimated';
 
 
 
@@ -121,7 +121,6 @@ const ItemDetails = ({ route }) => {
   const animatedScrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
         animatedScrollX.value = event.contentOffset.x;
-        console.log(animatedScrollX.value)
     }
 })
   
@@ -147,13 +146,17 @@ const ItemDetails = ({ route }) => {
     }
 
     const MainImage = ({ image, index }) => {
-        const ImageStyle = useAnimatedStyle(() => {
-            const scale = interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [0.7, 1, 0.7], Extrapolate.CLAMP)
+      const ImageStyle = useAnimatedStyle(() => {
+          const rotateXval = interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [-90, 0, 90], Extrapolate.CLAMP)
+          const scale = interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [0.7, 1, 0.7], Extrapolate.CLAMP)
             return {
                 transform: [
                     {
-                        scale
-                    }
+                        scale,
+                    },
+                    {
+                      rotateY: rotateXval + 'deg'
+                    },
                 ]
             }
         })
@@ -182,14 +185,14 @@ const ItemDetails = ({ route }) => {
     const Dot = ({ index }) => {
 
       const dotStyle = useAnimatedStyle(() => {
-          const scale = interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [0.7, 1, 0.7], Extrapolate.CLAMP)
+          const scale = interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [1, 1.2, 1], Extrapolate.CLAMP)
           const elevate = withTiming(interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [0, 10, 0], Extrapolate.CLAMP))
           const translateY = withTiming(interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [0, -1, 0], Extrapolate.CLAMP))
           const color = interpolateColor(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], ['rgba(255,255,255,0.5)', 'rgba(255,255,255,1)', 'rgba(255,255,255,0.5)'])
           return {
               transform: [
                   {
-                      scaleX: scale
+                      scale: scale
                   },
                   {
                       translateY: translateY
@@ -206,7 +209,7 @@ const ItemDetails = ({ route }) => {
           index={index}
           style={[{
                       height: 10,
-                      width: 20,
+                      width: 10,
                       borderRadius: 5,
                       backgroundColor: 'white',
                       marginHorizontal: 10,
@@ -219,20 +222,17 @@ const ItemDetails = ({ route }) => {
   }
 
 
-  return (
-    <SafeAreaView style={styles.container}>
-
-      {data ? (
-        <View>
-          <AddCommentModal modalVisible={modalVisible} setModalVisible={setModalVisible} />
-          {/* Top elemesnts*/}
-          <View style={{ 
+  const AnimatedCarousel=()=>{
+// not animated yet
+    return(
+<View style={[{
             width: width,
             height: height * 0.4,
+            overflow:"hidden",
             borderBottomLeftRadius:20,
             borderBottomRightRadius:20,
-            overflow:"hidden"
-          }}
+            elevation:5
+          }]}
             >
 
             {
@@ -262,7 +262,7 @@ const ItemDetails = ({ route }) => {
               colors={['transparent', 'rgba(0,0,0,0.2)']}
               style={styles.linearGradient}
             >
-              <ScrollView horizontal contentContainerStyle={{ alignItems: 'flex-end', marginBottom: 5 }}>
+              <ScrollView horizontal contentContainerStyle={{ alignItems: 'flex-end', paddingVertical: 5 }}>
                 {
                   data.images.map((_, index) => (
                     <Dot key={index} index={index}/>
@@ -275,26 +275,42 @@ const ItemDetails = ({ route }) => {
             </LinearGradient>
           </View>
 
+    )
+  }
+
+  return (
+    <SafeAreaView style={styles.container}>
+
+      {data ? (
+        <View>
+          <AddCommentModal modalVisible={modalVisible} setModalVisible={setModalVisible} />
+          
+          {/* Animated carousel*/}
+          <AnimatedCarousel/>
 
           {/* bottom sheet */}
 
           <View style={styles.bottomSheetStyle}>
-            <Text style={styles.textStyle} numberOfLines={1} adjustsFontSizeToFit>
+            <Text style={[styles.textStyle]} numberOfLines={1} adjustsFontSizeToFit>
               {data.title} • {data.brand}
             </Text>
 
             <View style={styles.extraInfoStyle}>
-              <Text style={{ ...styles.textStyle, fontWeight: 'normal', fontSize: 14}}>
+              <Text style={{ ...styles.textStyle, fontWeight: 'normal', fontSize: 14}} numberOfLines={1} adjustsFontSizeToFit>
                 {data.category.toUpperCase()}
               </Text>
               <Text style={{ marginHorizontal: 5 }}>•</Text>
               <MaterialCommunityIcons name="star" size={20} color="#F8ED62" />
-              <Text style={{ ...styles.textStyle, fontWeight: 'normal', fontSize: 14 }}>
+              <Text style={{ ...styles.textStyle, fontWeight: 'normal', fontSize: 14 }} numberOfLines={1} adjustsFontSizeToFit>
                 {data.rating}
               </Text>
               <Text style={{ marginHorizontal: 5 }}>•</Text>
-              <Text style={{ ...styles.textStyle, fontWeight: 'bold', fontSize: 14 }}>
-                $ {data.price} <Text style={{fontWeight:'normal',fontSize:12,color:'green'}}>(-{data.discountPercentage}%)</Text>
+              <Text style={{ ...styles.textStyle, fontWeight: 'bold', fontSize: 14}} numberOfLines={1} adjustsFontSizeToFit>
+                ${data.price}
+                {" "}
+                <Text style={{fontWeight:'normal',fontSize:14,color:'green'}}>(-{data.discountPercentage}%)</Text>
+                {" "}
+                <Text style={{fontWeight:'bold',fontSize:14,color:'tomato'}}>${data.price - (data.price * (data.discountPercentage / 100)).toFixed(0)}</Text>
               </Text>
               {/* <Text style={{ ...styles.textStyle,fontWeight:'normal', fontSize: 14 }} adjustsFontSizeToFit>
                 In stock: {data.stock}
@@ -311,7 +327,7 @@ const ItemDetails = ({ route }) => {
                 <Text style={{ ...styles.textStyle, fontWeight: 'normal', color: '#3ca98b', fontSize: 14, position: 'absolute', top: -10, left: 10, backgroundColor: '#e2f9de', paddingHorizontal: 5, borderRadius: 5 }}>
                   Details
                 </Text>
-                <ReadmoreCustom descriptiveText={data.description} numberOfLines={10} style={{ lineHeight: 21, fontSize: 14 }} />
+                <ReadmoreCustom descriptiveText={data.description} numberOfLines={10} style={{ fontFamily:'sans-serif-condensed',lineHeight: 21, fontSize: 14 }} />
 
               </View>
               {/* +- button, chat button, up/down vote button */}
@@ -421,11 +437,13 @@ const styles = StyleSheet.create({
   textStyle: {
     fontWeight: '800',
     fontSize: 20,
-    color: 'black'
+    color: 'black',
+    fontFamily:'sans-serif-condensed'
   },
   extraInfoStyle: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom:5
   },
   bottomButtonsStyle: {
     position: 'absolute',
