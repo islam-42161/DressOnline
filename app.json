@@ -6,7 +6,7 @@
     "assetBundlePatterns": [
       "**/*"
     ],
-    "description": "changed price section in item details and changed text font family",
+    "description": "A e-commerce app running with dummyjson api",
     "githubUrl": "https://github.com/islam-42161/DressOnline"
   },
   "name": "DressOnline"

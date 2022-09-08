@@ -18,6 +18,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import ReadmoreCustom from '../components/ReadmoreCustom';
 import AddCommentModal from '../components/AddCommentModal';
 import Animated, {Extrapolate, interpolate, interpolateColor, useAnimatedScrollHandler, useAnimatedStyle, useDerivedValue, useSharedValue, withTiming } from 'react-native-reanimated';
+import {useDispatch, useSelector } from 'react-redux';
+import { setCartButtonHeight, setData, setItems, setModalVisible, toggleWishlisted } from '../redux/slices/ItemDetailsStates';
 
 
 
@@ -26,11 +28,20 @@ const { width, height } = Dimensions.get('window');
 const ItemDetails = ({ route }) => {
   const { serial } = route.params;
   // states
-  const [items, setItems] = useState(0);
-  const [data, setData] = useState(null);
-  const [wishlisted, setWishlisted] = useState(false);
-  const [cartButtonHeight, setCartButtonHeight] = useState(0);
-  const [modalVisible, setModalVisible] = useState(false);
+  // const [items, setItems] = useState(0);
+  // const [data, setData] = useState(null);
+  // const [wishlisted, setWishlisted] = useState(false);
+  // const [cartButtonHeight, setCartButtonHeight] = useState(0);
+  // const [modalVisible, setModalVisible] = useState(false);
+
+
+  // redux variables
+  const dispatch = useDispatch()
+  const items = useSelector((state) => state.states.items)
+  const data = useSelector((state) => state.states.data)
+  const wishlisted = useSelector((state)=>state.states.wishlisted)
+  const cartButtonHeight = useSelector((state)=>state.states.cartButtonHeight)
+  const modalVisible = useSelector((state)=>state.states.modalVisible)
 
 
 
@@ -39,7 +50,7 @@ const ItemDetails = ({ route }) => {
     // fetch(`https://api.escuelajs.co/api/v1/products/${serial}`)
     fetch(`https://dummyjson.com/products/${serial}`)
       .then(res => res.json()).then(json => {
-        setData(json);
+        dispatch(setData(json))
       }).catch(err => { alert(`Could not load data: ${err}`) });
   },[])
 
@@ -61,7 +72,7 @@ const ItemDetails = ({ route }) => {
         ToastAndroid.SHORT,
         ToastAndroid.CENTER
       )
-    setWishlisted(!wishlisted);
+    dispatch(toggleWishlisted(!wishlisted));
   }
 
 
@@ -147,7 +158,7 @@ const ItemDetails = ({ route }) => {
                       </TouchableOpacity>
     
                       <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 20, backgroundColor: 'white', padding: 4, elevation: 3, margin:5 }}
-                        onPress={() => setModalVisible(!modalVisible)}
+                        onPress={() => dispatch(setModalVisible(!modalVisible))}
                       >
                         <MaterialCommunityIcons name="comment-account-outline" size={24} color="#3ca98b" />
                       </TouchableOpacity>
@@ -298,7 +309,7 @@ const ItemDetails = ({ route }) => {
 
       {data ? (
         <View>
-          <AddCommentModal modalVisible={modalVisible} setModalVisible={setModalVisible} />
+          <AddCommentModal modalVisible={modalVisible} setModalVisible={(value)=>dispatch(setModalVisible(value))} />
           
           {/* Animated carousel*/}
           <AnimatedCarousel/>
@@ -364,7 +375,7 @@ const ItemDetails = ({ route }) => {
 <View style={{ alignItems: 'center', backgroundColor: '#e2f9de', justifyContent: 'space-evenly', borderRadius: 5, borderColor: 'rgba(0,0,0,0.1)', elevation: 5}}>
                   <TouchableOpacity
                     style={{ alignItems: 'center', borderRadius: 5, backgroundColor: 'white', margin: 2 }}
-                    onPress={() => { setItems(items + 1) }}
+                    onPress={() => { dispatch(setItems(items + 1)) }}
                   >
                     <MaterialCommunityIcons name="plus" size={32} color="#3ca98b" />
                   </TouchableOpacity>
@@ -372,8 +383,8 @@ const ItemDetails = ({ route }) => {
                     {items}
                   </Text>
                   <TouchableOpacity style={{ alignItems: 'center', borderRadius: 5, backgroundColor: 'white', margin: 2 }}
-                    onPress={() => { if (items > 0) { setItems(items - 1) } }}
-                    onLongPress={() => { setItems(0) }}
+                    onPress={() => { if (items > 0) { dispatch(setItems(items - 1)) } }}
+                    onLongPress={() => { dispatch(setItems(0)) }}
                     disabled={!items}
                   >
                     <MaterialCommunityIcons name="minus" size={32} color={items > 0 ? "#3ca98b" : "lightgray"} />
@@ -390,7 +401,7 @@ const ItemDetails = ({ route }) => {
             style={styles.bottomButtonsStyle}
 
             onLayout={(event) => {
-              setCartButtonHeight(event.nativeEvent.layout.height);
+              dispatch(setCartButtonHeight(event.nativeEvent.layout.height));
             }
             }
           >
@@ -398,7 +409,7 @@ const ItemDetails = ({ route }) => {
             <TouchableOpacity activeOpacity={0.5} style={styles.addtocartButtonStyle} disabled={!items}
               onPress={() => {
                 if (items > 0) {
-                  setItems(0);
+                  dispatch(setItems(0));
                   ToastAndroid.showWithGravity(`${items} ${data.title} has been added to cart`, ToastAndroid.LONG, ToastAndroid.CENTER)
                 }
               }}
