@@ -5,7 +5,7 @@ const initialState = {
   data:null,
   wishlisted:false,
   cartButtonHeight:0,
-  modalVisible:false
+  modalVisible:false,
 }
 
 const ItemDetailsStates = createSlice({
@@ -26,7 +26,7 @@ const ItemDetailsStates = createSlice({
     },
     setModalVisible:(state,action)=>{
         state.modalVisible = action.payload
-    }
+    },
   },
 })
 

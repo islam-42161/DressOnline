@@ -14,12 +14,13 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React, { useEffect, useRef, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { LinearGradient } from 'expo-linear-gradient';
+
 import ReadmoreCustom from '../components/ReadmoreCustom';
 import AddCommentModal from '../components/AddCommentModal';
-import Animated, {Extrapolate, interpolate, interpolateColor, useAnimatedScrollHandler, useAnimatedStyle, useDerivedValue, useSharedValue, withTiming } from 'react-native-reanimated';
+
 import {useDispatch, useSelector } from 'react-redux';
 import { setCartButtonHeight, setData, setItems, setModalVisible, toggleWishlisted } from '../redux/slices/ItemDetailsStates';
+import AnimatedCarousel from '../components/AnimatedCarousel';
 
 
 
@@ -27,13 +28,6 @@ const { width, height } = Dimensions.get('window');
 
 const ItemDetails = ({ route }) => {
   const { serial } = route.params;
-  // states
-  // const [items, setItems] = useState(0);
-  // const [data, setData] = useState(null);
-  // const [wishlisted, setWishlisted] = useState(false);
-  // const [cartButtonHeight, setCartButtonHeight] = useState(0);
-  // const [modalVisible, setModalVisible] = useState(false);
-
 
   // redux variables
   const dispatch = useDispatch()
@@ -42,7 +36,6 @@ const ItemDetails = ({ route }) => {
   const wishlisted = useSelector((state)=>state.states.wishlisted)
   const cartButtonHeight = useSelector((state)=>state.states.cartButtonHeight)
   const modalVisible = useSelector((state)=>state.states.modalVisible)
-
 
 
   useEffect(() => {
@@ -58,7 +51,7 @@ const ItemDetails = ({ route }) => {
 
 
   // refs
-  const scrollViewImageRef = useRef();
+
 
   const toggleWishList = () => { //To toggle the show text or hide it
     !wishlisted ? ToastAndroid.showWithGravity(
@@ -107,47 +100,13 @@ const ItemDetails = ({ route }) => {
 
   
 
-  const onGotoIndex = ({ index }) => {
-    scrollViewImageRef.current?.scrollTo({ x: index * width, y: 0, animated: true });
-  }
-
-
-
-  const animatedScrollX = useSharedValue(0);
-  const animatedScrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-        animatedScrollX.value = event.contentOffset.x;
-    }
-})
-  
-      const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
-
-      const AnimatedBackImage = ({ index, image }) => {
-        const ImageStyle = useAnimatedStyle(() => {
-            const opacity = interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [0, 1, 0], Extrapolate.CLAMP)
-            return {
-                opacity: opacity
-            }
-        })
-        return (
-            <Animated.View key={index} style={[StyleSheet.absoluteFillObject, ImageStyle]}>
-                <Image
-                    source={{ uri: image }}
-                    style={StyleSheet.absoluteFillObject}
-                    blurRadius={50}
-
-                />
-            </Animated.View>
-        )
-    }
-
 
     // heart, share, comment
 
     const ActionButtons = ()=>{
      
       return(
-                      <View style={{ justifyContent: 'space-around', flexDirection:'row',zIndex:1,position:'absolute',right:0,bottom:20,backgroundColor:'rgba(255,255,255,0.5)',borderColor:'#e2f9de',borderWidth:1,borderRightWidth:0,borderTopLeftRadius:20,borderBottomLeftRadius:20}}>
+                      <View style={{ justifyContent: 'space-around', flexDirection:'row',backgroundColor:'#e2f9de',borderColor:'lightgreen',borderWidth:1,borderRadius:20}}>
 
                       <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 20, backgroundColor: 'white', padding: 4, elevation: 3, margin:5}} onPress={toggleWishList}>
                         <MaterialCommunityIcons name='heart' size={24} color={wishlisted ? "#ED4255" : "lightgray"} />
@@ -169,140 +128,10 @@ const ItemDetails = ({ route }) => {
 
 
 
-    const MainImage = ({ image, index }) => {
-      const ImageStyle = useAnimatedStyle(() => {
-          const rotateXval = interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [-90, 0, 90], Extrapolate.CLAMP)
-          const scale = interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [0.7, 1, 0.7], Extrapolate.CLAMP)
-            return {
-                transform: [
-                    {
-                        scale,
-                    },
-                    {
-                      rotateY: rotateXval + 'deg'
-                    },
-                ]
-            }
-        })
-        return (
-          <Animated.View style={[{ width: width, alignItems: 'center', justifyContent: 'center' }, ImageStyle]}>
-            {/* Top iamge and background with slider */}
-
-            <View
-              style={styles.imageContainer}>
-              {/* Background Image */}
-              <Image source={{ uri: image }}
-                style={{
-                  width: width - 40,
-                  height: height * 0.4 - 40,
-                  borderRadius: 10,
-                  // aspectRatio: 
-                }}
-                resizeMode={'contain'}
-              />
-
-            </View>
-
-          </Animated.View>
-        )
-    }
-
-    const Dot = ({ index }) => {
-
-      const dotStyle = useAnimatedStyle(() => {
-          // const scale = interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [1, 2, 1], Extrapolate.CLAMP)
-          // const translateY = withTiming(interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [0, -1, 0], Extrapolate.CLAMP))
-          const elevate = withTiming(interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [0, 10, 0], Extrapolate.CLAMP))
-          const widthInt = interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [10, 40, 10], Extrapolate.CLAMP)
-          const color = interpolateColor(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], ['rgba(0,0,0,1)', 'rgba(255,255,255,1)', 'rgba(0,0,0,1)'])
-          return {
-              // transform: [
-              //     {
-              //         scaleX: scale
-              //     },
-              //     {
-              //         translateY: translateY
-              //     }
-              // ],
-              elevation: elevate,
-              backgroundColor: color,
-              width:widthInt
-          }
-      })
+    
 
 
-      return (
-<AnimatedTouchable activeOpacity={1} 
-          index={index}
-          style={[{
-                      height: 10,
-                      width: 10,
-                      borderRadius:5,
-                      backgroundColor: 'white',
-                      marginHorizontal: 10,
-                    },
-                    dotStyle
-                  ]}
-                      onPress={() => onGotoIndex({ index })} 
-                      />
-      )
-  }
-
-
-  const AnimatedCarousel=()=>{
-// not animated yet
-    return(
-<View style={[{
-            width: width,
-            height: height * 0.4,
-            overflow:"hidden",
-            borderBottomLeftRadius:20,
-            borderBottomRightRadius:20,
-            // elevation:5
-          }]}
-            >
-<ActionButtons/>
-            {
-              data.images.map((image, index) => {
-                
-
-                return (
-                  <AnimatedBackImage image={image} key={index} index={index}/>
-                )
-
-              })}
-            <Animated.ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} ref={scrollViewImageRef}  onScroll={animatedScrollHandler}>
-              {/* scrollview item */}
-
-              {
-                data.images.map((image, index) => {
-                  
-                  return(
-                    <MainImage image={image} key={index} index={index}/>
-                  )
-                })}
-
-            </Animated.ScrollView>
-            {/* Linear Gradient */}
-            <LinearGradient
-              colors={['transparent', 'rgba(0,0,0,0.2)']}
-              style={styles.linearGradient}
-            >
-              <ScrollView horizontal contentContainerStyle={{ alignItems: 'flex-end', paddingVertical: 5 }}>
-                {
-                  data.images.map((_, index) => (
-                    <Dot key={index} index={index}/>
-                  )
-                  )
-
-                }
-
-              </ScrollView>
-            </LinearGradient>
-          </View>
-
-    )
-  }
+  
 
   return (
     <SafeAreaView style={styles.container}>
@@ -312,7 +141,7 @@ const ItemDetails = ({ route }) => {
           <AddCommentModal modalVisible={modalVisible} setModalVisible={(value)=>dispatch(setModalVisible(value))} />
           
           {/* Animated carousel*/}
-          <AnimatedCarousel/>
+          <AnimatedCarousel images={data.images}/>
 
           {/* bottom sheet */}
 
@@ -333,46 +162,50 @@ const ItemDetails = ({ route }) => {
             </View>
 
 {/* product title and brand*/}
-            <Text style={[styles.textStyle]} numberOfLines={1} adjustsFontSizeToFit>
+            <Text style={[styles.textStyle,{fontSize:24}]} numberOfLines={1} adjustsFontSizeToFit>
               {data.title}
             </Text>
-<View style={{justifyContent:'space-between',flexDirection:'row',marginVertical:5}}>
-  <Text style={{...styles.textStyle,fontSize:14,fontWeight:'500'}}>{data.brand}</Text>
+<View style={{justifyContent:'space-between',flexDirection:'row',marginVertical:5,alignItems:'center'}}>
+            {/* backgroundColor:'#e2f9de',paddingHorizontal:20 */}
             
-            <View style={{flexDirection:'row',alignItems:'center'}}>
+            <Text style={{...styles.textStyle,paddingVertical:10,paddingHorizontal:15,fontSize:16,fontWeight:'normal',borderWidth:1,borderColor:'lightgreen',color:'#3ca98b',backgroundColor:'#e2f9de',borderRadius:20}} numberOfLines={1} adjustsFontSizeToFit>{data.brand}</Text>
+
             
-                <View style={{flexDirection:'row',marginRight:5}}>
-            <Text style={{fontWeight:'bold',fontSize:14,color:'white',backgroundColor:'green',paddingHorizontal:5,borderRadius:10}}>${data.price - (data.price * (data.discountPercentage / 100)).toFixed(0)}</Text>
-                
-                <Text style={{fontWeight:'bold',fontSize:8,color:'green',position:'absolute',top:-12,right:-5,backgroundColor:'white',padding:2,borderRadius:10,elevation:2}}>-{data.discountPercentage}%</Text>
-                </View>
-                <Text style={{textDecorationLine:'line-through',color:'lightgray',fontSize:10}}>${data.price}</Text>
+<ActionButtons/>
               
-              </View>
+<View style={{flexDirection:'row',alignItems:'center'}}>
+            
+            <View style={{flexDirection:'row',marginRight:5}}>
+        <Text style={{fontWeight:'bold',fontSize:18,color:'white',backgroundColor:'green',paddingHorizontal:5,borderRadius:10}}>${data.price - (data.price * (data.discountPercentage / 100)).toFixed(0)}</Text>
+            
+            <Text style={{fontWeight:'bold',fontSize:8,color:'green',position:'absolute',top:-12,right:-8,backgroundColor:'white',padding:2,borderRadius:10,elevation:2}}>-{data.discountPercentage}%</Text>
+            </View>
+            <Text style={{textDecorationLine:'line-through',color:'lightgray',fontSize:12}}>${data.price}</Text>
+          
+          </View>
+
 
               </View>
 
             {/* Divider */}
             {/* <View style={{ height: 1, backgroundColor: 'rgba(0,0,0,0.1)', marginBottom: 5 }} /> */}
 
-            {/* Details and item =- button */}
+            {/* Details and item +- button */}
             <View style={{ flex: 1, flexDirection: 'row' }}>
+
               {/* Details */}
               <View style={[styles.detailsStyle, { marginBottom: cartButtonHeight }]}>
                 <Text style={{ ...styles.textStyle, fontWeight: 'normal', color: '#3ca98b', fontSize: 14, position: 'absolute', top: -10, left: 10, backgroundColor: '#e2f9de', paddingHorizontal: 5, borderRadius: 5 }}>
                   Details
                 </Text>
-                <ReadmoreCustom descriptiveText={data.description} numberOfLines={10} style={{ fontFamily:'sans-serif-condensed',lineHeight: 21, fontSize: 14 }} />
-
+                <ReadmoreCustom descriptiveText={data.description} numberOfLines={10} style={{ fontFamily:'sans-serif-condensed',lineHeight: 21, fontSize: 14}} />
               </View>
+
+
               {/* +- button, chat button, up/down vote button */}
               <View style={{ alignItems: 'center', marginBottom: cartButtonHeight, marginTop: 10, marginLeft: 10, justifyContent: 'flex-end' }}>
-
-
-
-
-{/* +- button */}
-<View style={{ alignItems: 'center', backgroundColor: '#e2f9de', justifyContent: 'space-evenly', borderRadius: 5, borderColor: 'rgba(0,0,0,0.1)', elevation: 5}}>
+                {/* +- button */}
+                <View style={{ alignItems: 'center', backgroundColor: '#e2f9de', justifyContent: 'space-evenly', borderRadius: 5, borderColor: 'rgba(0,0,0,0.1)', elevation: 5}}>
                   <TouchableOpacity
                     style={{ alignItems: 'center', borderRadius: 5, backgroundColor: 'white', margin: 2 }}
                     onPress={() => { dispatch(setItems(items + 1)) }}
