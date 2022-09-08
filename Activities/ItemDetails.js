@@ -1,4 +1,3 @@
-
 import {
   ActivityIndicator,
   Dimensions,
@@ -18,9 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { LinearGradient } from 'expo-linear-gradient';
 import ReadmoreCustom from '../components/ReadmoreCustom';
 import AddCommentModal from '../components/AddCommentModal';
-import Animated, { concat, event, Extrapolate, interpolate, interpolateColor, useAnimatedScrollHandler, useAnimatedStyle, useDerivedValue, useSharedValue, withTiming } from 'react-native-reanimated';
-
-
+import Animated, {Extrapolate, interpolate, interpolateColor, useAnimatedScrollHandler, useAnimatedStyle, useDerivedValue, useSharedValue, withTiming } from 'react-native-reanimated';
 
 
 
@@ -34,27 +31,23 @@ const ItemDetails = ({ route }) => {
   const [wishlisted, setWishlisted] = useState(false);
   const [cartButtonHeight, setCartButtonHeight] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
-  //const [imageIndex, setImageIndex] = useState(0);
+
+
+
+  useEffect(() => {
+    //fetch(`https://fakestoreapi.com/products/${serial}`)
+    // fetch(`https://api.escuelajs.co/api/v1/products/${serial}`)
+    fetch(`https://dummyjson.com/products/${serial}`)
+      .then(res => res.json()).then(json => {
+        setData(json);
+      }).catch(err => { alert(`Could not load data: ${err}`) });
+  },[])
+
+
+
 
   // refs
   const scrollViewImageRef = useRef();
-
-
-
-
-  // Animated shared values
-  const scrollX = useRef(new Animated.Value(0)).current;
-  const imageIndex = useRef(new Animated.Value(0)).current;
-
-  // Reanimated styles
-  // const color = useAnimatedStyle(() => {
-  //   return {
-  //     backgroundColor: Animated.interpolateColors(scrollX,{
-  //       inputRange: [0, width, width * 2],
-  //       outputRange: ['gray', 'white', 'gray']
-  //     })
-  //   }
-  // })
 
   const toggleWishList = () => { //To toggle the show text or hide it
     !wishlisted ? ToastAndroid.showWithGravity(
@@ -72,14 +65,6 @@ const ItemDetails = ({ route }) => {
   }
 
 
-  useEffect(() => {
-    //fetch(`https://fakestoreapi.com/products/${serial}`)
-    // fetch(`https://api.escuelajs.co/api/v1/products/${serial}`)
-    fetch(`https://dummyjson.com/products/${serial}`)
-      .then(res => res.json()).then(json => {
-        setData(json);
-      }).catch(err => { alert(`Could not load data: ${err}`) });
-  }, [])
 
 
   const TotalPrice = ({ style }) =>
@@ -92,7 +77,7 @@ const ItemDetails = ({ route }) => {
   const onShare = async () => {
     try {
       const result = await Share.share({
-        message: `${data.title} - ${data.brand} | $ ${data.price} | ${data.category.toUpperCase()}`,
+        message: `${data.title} - ${data.brand} | $${data.price} | ${data.category.toUpperCase()}`,
       });
       if (result.action === Share.sharedAction) {
         if (result.activityType) {
@@ -138,12 +123,40 @@ const ItemDetails = ({ route }) => {
                 <Image
                     source={{ uri: image }}
                     style={StyleSheet.absoluteFillObject}
-                    blurRadius={10}
+                    blurRadius={50}
 
                 />
             </Animated.View>
         )
     }
+
+
+    // heart, share, comment
+
+    const ActionButtons = ()=>{
+     
+      return(
+                      <View style={{ justifyContent: 'space-around', flexDirection:'row',zIndex:1,position:'absolute',right:0,bottom:20,backgroundColor:'rgba(255,255,255,0.5)',borderColor:'#e2f9de',borderWidth:1,borderRightWidth:0,borderTopLeftRadius:20,borderBottomLeftRadius:20}}>
+
+                      <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 20, backgroundColor: 'white', padding: 4, elevation: 3, margin:5}} onPress={toggleWishList}>
+                        <MaterialCommunityIcons name='heart' size={24} color={wishlisted ? "#ED4255" : "lightgray"} />
+                      </TouchableOpacity>
+    
+                      <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 20, backgroundColor: 'white', padding: 4, elevation: 3, margin:5}} onPress={onShare}>
+                        <MaterialCommunityIcons name="share-outline" size={24} color="#3ca98b" />
+                      </TouchableOpacity>
+    
+                      <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 20, backgroundColor: 'white', padding: 4, elevation: 3, margin:5 }}
+                        onPress={() => setModalVisible(!modalVisible)}
+                      >
+                        <MaterialCommunityIcons name="comment-account-outline" size={24} color="#3ca98b" />
+                      </TouchableOpacity>
+    
+                    </View>
+      )
+    }
+
+
 
     const MainImage = ({ image, index }) => {
       const ImageStyle = useAnimatedStyle(() => {
@@ -172,6 +185,7 @@ const ItemDetails = ({ route }) => {
                   width: width - 40,
                   height: height * 0.4 - 40,
                   borderRadius: 10,
+                  // aspectRatio: 
                 }}
                 resizeMode={'contain'}
               />
@@ -185,21 +199,23 @@ const ItemDetails = ({ route }) => {
     const Dot = ({ index }) => {
 
       const dotStyle = useAnimatedStyle(() => {
-          const scale = interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [1, 1.2, 1], Extrapolate.CLAMP)
+          // const scale = interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [1, 2, 1], Extrapolate.CLAMP)
+          // const translateY = withTiming(interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [0, -1, 0], Extrapolate.CLAMP))
           const elevate = withTiming(interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [0, 10, 0], Extrapolate.CLAMP))
-          const translateY = withTiming(interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [0, -1, 0], Extrapolate.CLAMP))
-          const color = interpolateColor(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], ['rgba(255,255,255,0.5)', 'rgba(255,255,255,1)', 'rgba(255,255,255,0.5)'])
+          const widthInt = interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [10, 40, 10], Extrapolate.CLAMP)
+          const color = interpolateColor(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], ['rgba(0,0,0,1)', 'rgba(255,255,255,1)', 'rgba(0,0,0,1)'])
           return {
-              transform: [
-                  {
-                      scale: scale
-                  },
-                  {
-                      translateY: translateY
-                  }
-              ],
+              // transform: [
+              //     {
+              //         scaleX: scale
+              //     },
+              //     {
+              //         translateY: translateY
+              //     }
+              // ],
               elevation: elevate,
-              backgroundColor: color
+              backgroundColor: color,
+              width:widthInt
           }
       })
 
@@ -210,7 +226,7 @@ const ItemDetails = ({ route }) => {
           style={[{
                       height: 10,
                       width: 10,
-                      borderRadius: 5,
+                      borderRadius:5,
                       backgroundColor: 'white',
                       marginHorizontal: 10,
                     },
@@ -231,10 +247,10 @@ const ItemDetails = ({ route }) => {
             overflow:"hidden",
             borderBottomLeftRadius:20,
             borderBottomRightRadius:20,
-            elevation:5
+            // elevation:5
           }]}
             >
-
+<ActionButtons/>
             {
               data.images.map((image, index) => {
                 
@@ -249,7 +265,6 @@ const ItemDetails = ({ route }) => {
 
               {
                 data.images.map((image, index) => {
-                  imageIndex.setValue(index);
                   
                   return(
                     <MainImage image={image} key={index} index={index}/>
@@ -291,34 +306,43 @@ const ItemDetails = ({ route }) => {
           {/* bottom sheet */}
 
           <View style={styles.bottomSheetStyle}>
-            <Text style={[styles.textStyle]} numberOfLines={1} adjustsFontSizeToFit>
-              {data.title} • {data.brand}
-            </Text>
 
-            <View style={styles.extraInfoStyle}>
-              <Text style={{ ...styles.textStyle, fontWeight: 'normal', fontSize: 14}} numberOfLines={1} adjustsFontSizeToFit>
+{/* extra infos */}
+
+          <View style={styles.extraInfoStyle}>
+              <Text style={{ ...styles.textStyle, fontWeight: 'normal', fontSize: 14,fontFamily:'sans-serif-light'}} numberOfLines={1} adjustsFontSizeToFit>
                 {data.category.toUpperCase()}
               </Text>
-              <Text style={{ marginHorizontal: 5 }}>•</Text>
+              <View style={{flexDirection:'row',alignItems:'center'}}>
               <MaterialCommunityIcons name="star" size={20} color="#F8ED62" />
-              <Text style={{ ...styles.textStyle, fontWeight: 'normal', fontSize: 14 }} numberOfLines={1} adjustsFontSizeToFit>
-                {data.rating}
+              <Text style={{ ...styles.textStyle, fontWeight: 'normal', fontSize: 14, fontFamily:'sans-serif-light'}} numberOfLines={1} adjustsFontSizeToFit>
+                ({data.rating})
               </Text>
-              <Text style={{ marginHorizontal: 5 }}>•</Text>
-              <Text style={{ ...styles.textStyle, fontWeight: 'bold', fontSize: 14}} numberOfLines={1} adjustsFontSizeToFit>
-                ${data.price}
-                {" "}
-                <Text style={{fontWeight:'normal',fontSize:14,color:'green'}}>(-{data.discountPercentage}%)</Text>
-                {" "}
-                <Text style={{fontWeight:'bold',fontSize:14,color:'tomato'}}>${data.price - (data.price * (data.discountPercentage / 100)).toFixed(0)}</Text>
-              </Text>
-              {/* <Text style={{ ...styles.textStyle,fontWeight:'normal', fontSize: 14 }} adjustsFontSizeToFit>
-                In stock: {data.stock}
-              </Text> */}
+              </View>
             </View>
 
+{/* product title and brand*/}
+            <Text style={[styles.textStyle]} numberOfLines={1} adjustsFontSizeToFit>
+              {data.title}
+            </Text>
+<View style={{justifyContent:'space-between',flexDirection:'row',marginVertical:5}}>
+  <Text style={{...styles.textStyle,fontSize:14,fontWeight:'500'}}>{data.brand}</Text>
+            
+            <View style={{flexDirection:'row',alignItems:'center'}}>
+            
+                <View style={{flexDirection:'row',marginRight:5}}>
+            <Text style={{fontWeight:'bold',fontSize:14,color:'white',backgroundColor:'green',paddingHorizontal:5,borderRadius:10}}>${data.price - (data.price * (data.discountPercentage / 100)).toFixed(0)}</Text>
+                
+                <Text style={{fontWeight:'bold',fontSize:8,color:'green',position:'absolute',top:-12,right:-5,backgroundColor:'white',padding:2,borderRadius:10,elevation:2}}>-{data.discountPercentage}%</Text>
+                </View>
+                <Text style={{textDecorationLine:'line-through',color:'lightgray',fontSize:10}}>${data.price}</Text>
+              
+              </View>
+
+              </View>
+
             {/* Divider */}
-            <View style={{ height: 1, backgroundColor: 'rgba(0,0,0,0.1)', marginBottom: 5 }} />
+            {/* <View style={{ height: 1, backgroundColor: 'rgba(0,0,0,0.1)', marginBottom: 5 }} /> */}
 
             {/* Details and item =- button */}
             <View style={{ flex: 1, flexDirection: 'row' }}>
@@ -331,10 +355,13 @@ const ItemDetails = ({ route }) => {
 
               </View>
               {/* +- button, chat button, up/down vote button */}
-              <View style={{ alignItems: 'center', marginBottom: cartButtonHeight, marginTop: 10, marginLeft: 10, justifyContent: 'space-between' }}>
+              <View style={{ alignItems: 'center', marginBottom: cartButtonHeight, marginTop: 10, marginLeft: 10, justifyContent: 'flex-end' }}>
 
-                {/* +- button */}
-                <View style={{ alignItems: 'center', backgroundColor: '#e2f9de', justifyContent: 'space-evenly', borderRadius: 5, borderColor: 'rgba(0,0,0,0.1)', elevation: 5 }}>
+
+
+
+{/* +- button */}
+<View style={{ alignItems: 'center', backgroundColor: '#e2f9de', justifyContent: 'space-evenly', borderRadius: 5, borderColor: 'rgba(0,0,0,0.1)', elevation: 5}}>
                   <TouchableOpacity
                     style={{ alignItems: 'center', borderRadius: 5, backgroundColor: 'white', margin: 2 }}
                     onPress={() => { setItems(items + 1) }}
@@ -352,26 +379,6 @@ const ItemDetails = ({ route }) => {
                     <MaterialCommunityIcons name="minus" size={32} color={items > 0 ? "#3ca98b" : "lightgray"} />
                   </TouchableOpacity>
                 </View>
-
-                {/* heart, share, comment */}
-                <View style={{ flex: 1, justifyContent: 'space-around', marginTop: 5 }}>
-
-                  <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 20, backgroundColor: 'white', padding: 4, elevation: 3 }} onPress={toggleWishList}>
-                    <MaterialCommunityIcons name='heart' size={24} color={wishlisted ? "#ED4255" : "lightgray"} />
-                  </TouchableOpacity>
-
-                  <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 20, backgroundColor: 'white', padding: 4, elevation: 3 }} onPress={onShare}>
-                    <MaterialCommunityIcons name="share-outline" size={24} color="#3ca98b" />
-                  </TouchableOpacity>
-
-                  <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 20, backgroundColor: 'white', padding: 4, elevation: 3 }}
-                    onPress={() => setModalVisible(!modalVisible)}
-                  >
-                    <MaterialCommunityIcons name="comment-account-outline" size={24} color="#3ca98b" />
-                  </TouchableOpacity>
-
-                </View>
-
 
               </View>
             </View>
@@ -443,7 +450,8 @@ const styles = StyleSheet.create({
   extraInfoStyle: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom:5
+    marginVertical:5,
+    justifyContent:'space-between'
   },
   bottomButtonsStyle: {
     position: 'absolute',
