@@ -206,66 +206,11 @@ const AnimatedCarousel=({images})=>{
 export default AnimatedCarousel
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: 'white',
-    },
     imageContainer: {
       borderRadius: 10,
       elevation: 10,
     },
-    bottomSheetStyle: {
-      flex: 1,
-      width,
-      padding: 10
-    },
-    textStyle: {
-      fontWeight: '800',
-      fontSize: 20,
-      color: 'black',
-      fontFamily:'sans-serif-condensed'
-    },
-    extraInfoStyle: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginVertical:5,
-      justifyContent:'space-between'
-    },
-    bottomButtonsStyle: {
-      position: 'absolute',
-      paddingBottom: 5,
-      bottom: 0,
-      flexDirection: 'row',
-      width: '100%',
-      justifyContent: 'center',
-    },
-    addtocartButtonStyle: {
-      backgroundColor: '#e2f9de',
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginHorizontal: 5,
-      paddingHorizontal: 10,
-      paddingVertical: 5,
-      borderRadius: 6,
-    },
-    totalPriceStyle: {
-      color: '#3ca98b',
-      fontSize: 10,
-      marginLeft: 20,
-      borderRadius: 3,
-      fontWeight: 'bold',
-      letterSpacing: 0.5,
-    },
-    detailsStyle: {
-      borderWidth: 1,
-      padding: 10,
-      marginTop: 10,
-      borderColor: 'rgba(0,0,0,0.1)',
-      borderRadius: 5,
-      flex: 1
-    },
+  
     linearGradient: {
       alignItems: 'center',
       position: 'absolute',

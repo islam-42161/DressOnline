@@ -31,11 +31,16 @@ const ItemDetails = ({ route }) => {
 
   // redux variables
   const dispatch = useDispatch()
-  const items = useSelector((state) => state.states.items)
-  const data = useSelector((state) => state.states.data)
-  const wishlisted = useSelector((state)=>state.states.wishlisted)
-  const cartButtonHeight = useSelector((state)=>state.states.cartButtonHeight)
-  const modalVisible = useSelector((state)=>state.states.modalVisible)
+
+const {items,data,wishlisted,cartButtonHeight,modalVisible} = useSelector((state)=>{
+  return{
+    items: state.states.items,
+    data: state.states.data,
+    wishlisted: state.states.wishlisted,
+    cartButtonHeight: state.states.cartButtonHeight,
+    modalVisible: state.states.modalVisible
+  }
+})
 
 
   useEffect(() => {
@@ -47,10 +52,6 @@ const ItemDetails = ({ route }) => {
       }).catch(err => { alert(`Could not load data: ${err}`) });
   },[])
 
-
-
-
-  // refs
 
 
   const toggleWishList = () => { //To toggle the show text or hide it
@@ -276,10 +277,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'white',
   },
-  imageContainer: {
-    borderRadius: 10,
-    elevation: 10,
-  },
   bottomSheetStyle: {
     flex: 1,
     width,
@@ -330,11 +327,4 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     flex: 1
   },
-  linearGradient: {
-    alignItems: 'center',
-    position: 'absolute',
-    bottom: 0,
-    width: width,
-    height: 50
-  }
 })
