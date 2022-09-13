@@ -16,6 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Ionicons } from '@expo/vector-icons';
 import SearchFail from '../components/SearchFail'
+import GridItem from "../components/GridItem";
 
 
 const wait = (timeout) => {
@@ -39,24 +40,28 @@ const ItemList = ({ navigation }) => {
   
   }, []);
 
+
   let total = 0;
   async function loadData(api) {
+
+    
     //fetch("https://fakestoreapi.com/products")
     // fetch("https://api.escuelajs.co/api/v1/products")
     // https://dummyjson.com/products/
-    setData([])
-    setCurrentState(states.loading);
-    fetch(api)
-      .then((res) => res.json())
-      .then((json) => {
-        setData(json.products);
-        total = json.total;
-        if(total>0){
-          setCurrentState(states.success)
-        }else{
-          setCurrentState(states.failed)
-        }
-      });
+    
+      setData([])
+      setCurrentState(states.loading);
+      fetch(api)
+        .then((res) => res.json())
+        .then((json) => {
+          setData(json.products);
+          total = json.total;
+          if(total>0){
+            setCurrentState(states.success)
+          }else{
+            setCurrentState(states.failed)
+          }
+        });
   }
 
   const clearSearch = () => {
@@ -125,73 +130,13 @@ const ItemList = ({ navigation }) => {
             }
             renderItem={({ item, index }) => {
               return (
-                <TouchableOpacity style={styles.itemStyle}
-                  onPress={() => navigation.navigate('ItemDetails', { serial: item.id })}
-                >
-                  {/* <Text style={{ ...styles.textStyle, ...styles.tagStyle }}>
-      {item.category.name.toUpperCase()}
-    </Text> */}
-                  <View style={styles.imageContainer}>
-                    <Image source={{ uri: item.thumbnail }} style={styles.imageStyle} />
-                    {item.stock > 0 ? (
-                      <Text style={{ position: 'absolute', bottom: 5, right: 5, backgroundColor: 'rgba(0,200,0,0.7)', color: "white", fontWeight: '700', fontSize: 10, paddingVertical: 2, paddingHorizontal: 4, borderRadius: 2, ...styles.textStyle }}>Available: {item.stock}</Text>
-                    ) : (
-                      <Text style={{ position: 'absolute', bottom: 5, right: 5, backgroundColor: 'rgba(200,0,0,0.7)', color: "white", fontWeight: '700', fontSize: 10, paddingVertical: 2, paddingHorizontal: 4, borderRadius: 2, ...styles.textStyle }}>Not Available</Text>)
-                    }
-                  </View>
-                  {/* bottom part */}
-                  <View style={{ padding: 10, flex: 1, width: "100%" }}>
-                    <Text style={[styles.textStyle, { fontWeight: 'bold', ...styles.textStyle, fontSize: 14, textTransform: 'uppercase' }]} numberOfLines={2} adjustsFontSizeToFit>
-                      {item.title}
-                    </Text>
-
-                    {/* brand, rating, price section */}
-                    <View style={{ justifyContent: 'center', flex: 1, width: "100%", alignItems: 'center' }}>
-                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Text style={{ ...styles.textStyle, flex: 1, textTransform: 'capitalize' }} numberOfLines={1} adjustsFontSizeToFit >{item.brand}</Text>
-                        <Text style={{ ...styles.textStyle }} >⭐{item.rating}</Text>
-                      </View>
-
-                      {/* price section */}
-
-
-
-                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: "100%", alignItems: 'center' }}>
-
-
-                        <Text style={{ ...styles.textStyle }} >Price: </Text>
-                        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }} >
-                          <Text style={{ ...styles.textStyle }} adjustsFontSizeToFit numberOfLines={1}>
-
-
-                            <Text style={{ color: 'gray', fontWeight: '400', textDecorationLine: 'line-through' }} >
-                              ${item.price}
-                            </Text>
-                            {" "}
-                            <Text style={{ color: 'green', ...styles.textStyle }} >
-                              (-{item.discountPercentage}%)
-                            </Text>
-
-                            {" "}
-                            <Text style={{ color: 'tomato', fontWeight: 'bold', letterSpacing: 1, ...styles.textStyle }} >
-                              ${item.price - (item.price * (item.discountPercentage / 100)).toFixed(0)}
-                            </Text>
-
-                          </Text>
-
-                        </View>
-
-                      </View>
-
-                    </View>
-                  </View>
-                  <View style={{ width: '100%', backgroundColor: 'black', bottom: -1 }}>
-                    <Text style={{ color: 'white', textTransform: 'uppercase', textAlign: 'center', fontWeight: '800', marginBottom: 1 }}>{item.category}</Text>
-                  </View>
-                </TouchableOpacity>
+    <GridItem item={item}
+    onPress={() => navigation.navigate('ItemDetails', { serial: item.id })}
+    />
               );
             }}
             keyExtractor={(item) => item.id}
+            
           />
 
         )}

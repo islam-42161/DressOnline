@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import SearchFail from '../components/SearchFail'
+import ShowImage from './ShowImage'
 
 const Test = () => {
   return (
-    <SearchFail/>
+    <ShowImage/>
   )
 }
 

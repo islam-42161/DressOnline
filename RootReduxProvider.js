@@ -11,6 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Home from './Activities/Home';
 import Settings from './Activities/Settings';
 import Test from './Activities/Test';
+import NoInternet from './components/NoInternet';
 const Screen = createBottomTabNavigator().Screen;
 const Navigator = createBottomTabNavigator().Navigator;
 
@@ -54,6 +55,7 @@ const RootReduxProvider = () => {
       </Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>
+    <NoInternet/>
     </SafeAreaProvider>
   )
 }
