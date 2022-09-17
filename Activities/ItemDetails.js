@@ -170,7 +170,7 @@ const ItemDetails = ({ route, navigation }) => {
           </View>
           {/* Animated carousel*/}
           {/* scrollViewImageRef,onGotoIndex,animatedScrollX,animatedScrollHandler */}
-          <AnimatedCarousel images={data.images} animatedScrollHandler={animatedScrollHandler} animatedScrollX={animatedScrollX} onGotoIndex={onGotoIndex} scrollViewImageRef={scrollViewImageRef} />
+          <AnimatedCarousel images={data.images} animatedScrollHandler={animatedScrollHandler} animatedScrollX={animatedScrollX} scrollViewImageRef={scrollViewImageRef} />
 
           {/* bottom sheet */}
 
@@ -209,7 +209,7 @@ const ItemDetails = ({ route, navigation }) => {
                 </View>
                 {/* discount rate */}
                 <View style={[styles.miniscrollItemStyle]}>
-                  <Text>Discount: <Text style={{ fontWeight: 'bold' }}>-{data.discountPercentage}%</Text></Text>
+                  <Text>Discount: <Text style={{ fontWeight: 'bold' }}>{data.discountPercentage}%</Text></Text>
                 </View>
                 {/* category */}
                 <View style={styles.miniscrollItemStyle}>

@@ -39,9 +39,9 @@ const AddToCart = ({ dispatch, setItems, items }) => {
 
         const AnimatedButton = Animated.createAnimatedComponent(TouchableOpacity)
         const iconStyle = useAnimatedStyle(() => {
-            const iconColor = interpolateColor(shown.value, [0, 1], ['rgba(0,0,0,1)', 'rgba(255,255,255,1)'])
+            const color = interpolateColor(shown.value, [0, 1], ['rgba(0,0,0,1)', 'rgba(255,255,255,1)'])
             return {
-                color: iconColor
+                color,
             }
 
         })
@@ -55,7 +55,7 @@ const AddToCart = ({ dispatch, setItems, items }) => {
         const AnimatedIcon = Animated.createAnimatedComponent(Ionicons)
         return (
             <AnimatedButton activeOpacity={1} style={[styles.cartButton, cartButtonStyle]} onPress={() => toggleView(!showExtra)}>
-                <AnimatedIcon name="ios-cart" size={24} style={iconStyle} />
+                <AnimatedIcon name={showExtra ? "ios-close" : "ios-cart"} size={24} style={iconStyle} />
                 {items > 0 && (
                     <View style={{ position: 'absolute', right: -0, top: -0, width: 10, height: 10, backgroundColor: 'lightgreen', borderRadius: 5 }} />
                 )}

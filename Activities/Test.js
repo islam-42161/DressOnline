@@ -4,9 +4,7 @@ import AddToCart from '../components/AddToCart'
 
 const Test = () => {
   return (
-    <View>
-
-    </View>
+    <AddToCart />
   )
 }
 

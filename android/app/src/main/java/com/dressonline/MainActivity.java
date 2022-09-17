@@ -8,6 +8,7 @@ import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.ReactRootView;
 
 import expo.modules.ReactActivityDelegateWrapper;
+import com.dylanvann.fastimage.FastImageViewPackage;
 
 public class MainActivity extends ReactActivity {
   @Override
