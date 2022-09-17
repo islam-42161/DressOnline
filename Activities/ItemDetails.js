@@ -7,8 +7,10 @@ import {
   View,
   ToastAndroid,
   Share,
+  ScrollView,
 } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
@@ -16,10 +18,11 @@ import ReadmoreCustom from '../components/ReadmoreCustom';
 import AddCommentModal from '../components/AddCommentModal';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { setCartButtonHeight, setData, setItems, setModalVisible, toggleWishlisted } from '../redux/slices/ItemDetailsStates';
+import { setData, setItems, setModalVisible, toggleWishlisted } from '../redux/slices/ItemDetailsStates';
 import AnimatedCarousel from '../components/AnimatedCarousel';
 import { useAnimatedRef, useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 import DotsCarousel from '../components/DotsCarousel';
+import AddToCart from '../components/AddToCart';
 
 
 
@@ -28,18 +31,17 @@ import DotsCarousel from '../components/DotsCarousel';
 
 const { width, height } = Dimensions.get('window');
 
-const ItemDetails = ({ route,navigation }) => {
+const ItemDetails = ({ route, navigation }) => {
   const { serial } = route.params;
 
   // redux variables
   const dispatch = useDispatch()
 
-  const { items, data, wishlisted, cartButtonHeight, modalVisible } = useSelector((state) => {
+  const { items, data, wishlisted, modalVisible } = useSelector((state) => {
     return {
       items: state.states.items,
       data: state.states.data,
       wishlisted: state.states.wishlisted,
-      cartButtonHeight: state.states.cartButtonHeight,
       modalVisible: state.states.modalVisible,
     }
   })
@@ -75,7 +77,7 @@ const ItemDetails = ({ route,navigation }) => {
   }
 
 
-  let price = data ? data.price - (data.price * (data.discountPercentage / 100)).toFixed(0) : 0
+  let price = data ? data.price - (data.price * (data.discountPercentage / 100)).toFixed(2) : 0
 
   const TotalPrice = ({ style }) =>
   (
@@ -109,20 +111,20 @@ const ItemDetails = ({ route,navigation }) => {
 
   const ActionButtons = () => {
     return (
-      <View style={{ justifyContent: 'space-between', flexDirection: 'row'}}>
+      <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
 
-        <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 20, backgroundColor: 'white', padding: 4, elevation: 3 }} onPress={toggleWishList}>
+        <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', width: 32, height: 32, padding: 4 }} onPress={toggleWishList}>
           <MaterialCommunityIcons name='heart' size={24} color={wishlisted ? "#ED4255" : "lightgray"} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 20, backgroundColor: 'white', padding: 4, elevation: 3, marginHorizontal: 5 }} onPress={onShare}>
-          <MaterialCommunityIcons name="share-outline" size={24} color="#3ca98b" />
+        <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', width: 32, height: 32, padding: 4, marginHorizontal: 5 }} onPress={onShare}>
+          <Ionicons name="ios-share-outline" size={24} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 20, backgroundColor: 'white', padding: 4, elevation: 3 }}
+        <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', width: 32, height: 32, padding: 4 }}
           onPress={() => dispatch(setModalVisible(!modalVisible))}
         >
-          <MaterialCommunityIcons name="comment-account-outline" size={24} color="#3ca98b" />
+          <MaterialCommunityIcons name="comment-account-outline" size={24} />
         </TouchableOpacity>
 
       </View>
@@ -133,17 +135,17 @@ const ItemDetails = ({ route,navigation }) => {
 
   // to share into child components
   const scrollViewImageRef = useAnimatedRef();
-  
+
   const onGotoIndex = ({ index }) => {
-    scrollViewImageRef.current?.scrollTo({ x: index * width, y: 0, animated:true});
+    scrollViewImageRef.current?.scrollTo({ x: index * width, y: 0, animated: true });
   }
 
   const animatedScrollX = useSharedValue(0);
   const animatedScrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
-        animatedScrollX.value = event.contentOffset.x;
+      animatedScrollX.value = event.contentOffset.x;
     }
-})
+  })
 
 
 
@@ -156,13 +158,19 @@ const ItemDetails = ({ route,navigation }) => {
 
 
 
-<View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-  <Text onPress={()=>navigation.goBack()}>Back</Text>
-  <ActionButtons/>
-</View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 10 }}>
+            <TouchableOpacity
+              style={{ flexDirection: 'row', alignItems: 'center' }}
+              onPress={() => navigation.goBack()}
+            >
+              <Ionicons name="chevron-back" size={32} color="black" />
+              <Text style={{ fontWeight: '500', textTransform: 'uppercase', fontSize: 16 }}>{data.category}</Text>
+            </TouchableOpacity>
+            <ActionButtons />
+          </View>
           {/* Animated carousel*/}
           {/* scrollViewImageRef,onGotoIndex,animatedScrollX,animatedScrollHandler */}
-          <AnimatedCarousel images={data.images} animatedScrollHandler={animatedScrollHandler} animatedScrollX={animatedScrollX} onGotoIndex={onGotoIndex} scrollViewImageRef={scrollViewImageRef}/>
+          <AnimatedCarousel images={data.images} animatedScrollHandler={animatedScrollHandler} animatedScrollX={animatedScrollX} onGotoIndex={onGotoIndex} scrollViewImageRef={scrollViewImageRef} />
 
           {/* bottom sheet */}
 
@@ -171,118 +179,53 @@ const ItemDetails = ({ route,navigation }) => {
             {/* extra infos */}
 
             <View style={styles.extraInfoStyle}>
-              <Text style={{ ...styles.textStyle, fontWeight: 'normal', fontSize: 14,}} numberOfLines={1} adjustsFontSizeToFit>
-              {data.brand}
+
+              <Text style={{ ...styles.textStyle, fontWeight: 'normal', fontSize: 14, }} numberOfLines={1} adjustsFontSizeToFit>
+                {data.brand}
               </Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <MaterialCommunityIcons name="star" size={20} color="#F8ED62" />
-                <Text style={{ ...styles.textStyle, fontWeight: 'normal', fontSize: 14,}} numberOfLines={1} adjustsFontSizeToFit>
-                  ({data.rating})
-                </Text>
-              </View>
-              <DotsCarousel animatedScrollX={animatedScrollX} dots={data.images} onGotoIndex={onGotoIndex}/>
+
+              <DotsCarousel animatedScrollX={animatedScrollX} dots={data.images} onGotoIndex={onGotoIndex} style={{ paddingVertical: 5 }} />
+
             </View>
 
             {/* product title and brand*/}
             <Text style={[styles.textStyle, { fontSize: 24 }]} numberOfLines={1} adjustsFontSizeToFit>
               {data.title}
             </Text>
-            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: 5, alignItems: 'center', }}>
-              {/* backgroundColor:'#e2f9de',paddingHorizontal:20 */}
-
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-
-<View style={{ flexDirection: 'row', marginRight: 5 }}>
-  <Text style={{ fontWeight: '600', fontSize: 18, color: 'gray',backgroundColor:'white',paddingHorizontal: 5, borderRadius: 10, elevation: 2  }} adjustsFontSizeToFit numberOfLines={1}>${price}</Text>
-
-  <Text style={{ fontWeight: 'bold', fontSize: 8, color: 'green', position: 'absolute', top: -12, right: -8, backgroundColor: 'white', padding: 2, borderRadius: 10}} adjustsFontSizeToFit numberOfLines={1}>-{data.discountPercentage}%</Text>
-</View>
-<Text style={{ textDecorationLine: 'line-through', color: 'lightgray', fontSize: 12 }} adjustsFontSizeToFit numberOfLines={1} >${data.price}</Text>
-
-</View>
-
-              <View style={{ padding: 10, borderWidth: 1, borderColor: 'lightgreen', backgroundColor: '#e2f9de', borderRadius: 20, alignItems: 'center' }}>
-                <Text style={{ ...styles.textStyle, fontSize: 16, fontWeight: 'normal', color: '#3ca98b',textTransform:'capitalize' }} numberOfLines={1} adjustsFontSizeToFit>{data.category}</Text>
-              </View>
-
-              {/* <ActionButtons /> */}
-
-
+            <View style={{ flexDirection: 'row', marginTop: 5, alignSelf: 'flex-start' }}>
+              <Text style={{ fontWeight: 'bold', fontSize: 20, lineHeight: 30 }} adjustsFontSizeToFit numberOfLines={1}>${price}</Text>
+              <Text style={{ textDecorationLine: 'line-through', fontSize: 11, lineHeight: 37, marginLeft: 2, color: 'lightgray' }}>${data.price}</Text>
             </View>
 
-            {/* Divider */}
-            {/* <View style={{ height: 1, backgroundColor: 'rgba(0,0,0,0.1)', marginBottom: 5 }} /> */}
 
-            {/* Details and item +- button */}
-            <View style={{ flex: 1, flexDirection: 'row' }}>
-
-              {/* Details */}
-              <View style={[styles.detailsStyle]}>
-                <Text style={{ ...styles.textStyle, fontWeight: 'normal', color: '#3ca98b', fontSize: 14, position: 'absolute', top: -10, left: 10, backgroundColor: '#e2f9de', paddingHorizontal: 5, borderRadius: 5 }}>
-                  Details
-                </Text>
-                {/* data.description
-                Lorem ipsum dolor sit amet. Aut voluptas velit ut tenetur quibusdam sit quia molestias. Ut quam beatae aut repellat numquam qui fugiat maxime et enim sunt qui minus veniam a earum ipsum. </p><p>Sit pariatur iste sit asperiores tenetur quo porro neque ex dolorum vitae? Et assumenda sunt est perspiciatis pariatur non magni voluptatem non perspiciatis sequi sit voluptatem voluptas sit quod consequatur aut unde dolorem. </p><p>Sit dolorum deserunt et sequi quia sit quisquam veniam et nisi rerum cum odio dolores 33 nihil soluta? Sit perspiciatis commodi aut quam rerum ea architecto tempora
-                 */}
-                <ReadmoreCustom descriptiveText={data.description} numberOfLines={5} textstyle={{lineHeight: 21, fontSize: 14 }} />
-              </View>
-
-
+            <View style={{ width: "100%", marginBottom: 10 }}>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+              >
+                {/* category */}
+                <View style={styles.miniscrollItemStyle}>
+                  <Text>Rating: ⭐ {data.rating}</Text>
+                </View>
+                {/* discount rate */}
+                <View style={[styles.miniscrollItemStyle]}>
+                  <Text>Discount: <Text style={{ fontWeight: 'bold' }}>-{data.discountPercentage}%</Text></Text>
+                </View>
+                {/* category */}
+                <View style={styles.miniscrollItemStyle}>
+                  <Text>In stock: <Text style={{ fontWeight: 'bold' }}>{data.stock}</Text></Text>
+                </View>
+              </ScrollView>
             </View>
 
-          </View>
+            {/* rating, discount rate */}
+            <ReadmoreCustom descriptiveText={data.description} numberOfLines={5} textstyle={{ lineHeight: 21, fontSize: 14 }} />
 
-          {/* Bottom Buttons */}
-          <View
-            style={styles.bottomButtonsStyle}
-
-            onLayout={(event) => {
-              dispatch(setCartButtonHeight(event.nativeEvent.layout.height));
-            }
-            }
-          >
-            {/* plus button */}
-            <TouchableOpacity
-              style={{ alignItems: 'center', borderRadius: 5, backgroundColor: 'white', margin: 2, elevation: 5 }}
-              onPress={() => { dispatch(setItems(items + 1)) }}
-            >
-              <MaterialCommunityIcons name="plus" size={32} color="#3ca98b" />
-            </TouchableOpacity>
-
-            <TouchableOpacity activeOpacity={0.5} style={styles.addtocartButtonStyle} disabled={!items}
-              onPress={() => {
-                if (items > 0) {
-                  dispatch(setItems(0));
-                  ToastAndroid.showWithGravity(`${items} ${data.title} has been added to cart`, ToastAndroid.LONG, ToastAndroid.CENTER)
-                }
-              }}
-            >
-              {items > 0 && (<Text style={{ fontWeight: 'bold', fontSize: 15, color: '#3ca98b', paddingHorizontal: 10, borderRadius: 20, backgroundColor: '#e2f9de', marginHorizontal: 5 }}>
-                {items}
-              </Text>)}
-              <Text style={{ ...styles.textStyle, color: '#e2f9de', fontSize: 18, fontWeight: 'bold' }}>Add to cart</Text>
-              <TotalPrice style={styles.totalPriceStyle} />
-
-
-            </TouchableOpacity>
-
-            {/* minus button */}
-            <TouchableOpacity style={{ alignItems: 'center', borderRadius: 5, backgroundColor: 'white', margin: 2, elevation: 5 }}
-              onPress={() => { if (items > 0) { dispatch(setItems(items - 1)) } }}
-              onLongPress={() => { dispatch(setItems(0)) }}
-              disabled={!items}
-            >
-              <MaterialCommunityIcons name="minus" size={32} color={items > 0 ? "#3ca98b" : "lightgray"} />
-            </TouchableOpacity>
-
-            {/* <TouchableOpacity activeOpacity={0.5} style={{ ...styles.addtocartButtonStyle, backgroundColor: '#3ca98b' }} disabled={!items}>
-              <Text style={{ ...styles.textStyle, color: '#e2f9de', fontSize: 12, fontWeight: 'normal' }}>Buy Now</Text>
-              <TotalPrice style={{ ...styles.totalPriceStyle, color: '#e2f9de' }} />
-            </TouchableOpacity> */}
 
           </View>
 
 
+          <AddToCart dispatch={dispatch} setItems={setItems} items={items} />
 
         </View>
       ) : (<ActivityIndicator />)}
@@ -313,8 +256,8 @@ const styles = StyleSheet.create({
   extraInfoStyle: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 5,
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    width: "100%"
   },
   bottomButtonsStyle: {
     // position: 'absolute',
@@ -323,6 +266,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     width: '100%',
     justifyContent: 'center',
+    alignItems: 'center'
     // flex: 1
   },
   addtocartButtonStyle: {
@@ -353,4 +297,14 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     flex: 1
   },
+  miniscrollItemStyle: {
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 5,
+  }
 })

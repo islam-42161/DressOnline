@@ -1,10 +1,12 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import ShowImage from './ShowImage'
+import AddToCart from '../components/AddToCart'
 
 const Test = () => {
   return (
-    <ShowImage/>
+    <View>
+
+    </View>
   )
 }
 
