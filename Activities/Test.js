@@ -1,13 +1,19 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import AddToCart from '../components/AddToCart'
+import { StyleSheet, Text } from "react-native";
+import React from "react";
+import BottomSheet from "../components/item_details_components/BottomSheet";
 
 const Test = () => {
   return (
-    <AddToCart />
-  )
-}
+    <BottomSheet>
+      <Text>A lovely sunny day</Text>
+    </BottomSheet>
+  );
+};
 
-export default Test
+export default Test;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});

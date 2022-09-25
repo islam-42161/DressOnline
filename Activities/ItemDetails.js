@@ -50,8 +50,6 @@ const ItemDetails = ({ route, navigation }) => {
     };
   });
 
-  //git check
-
   useEffect(() => {
     //fetch(`https://fakestoreapi.com/products/${serial}`)
     // fetch(`https://api.escuelajs.co/api/v1/products/${serial}`)
