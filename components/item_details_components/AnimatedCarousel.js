@@ -7,19 +7,32 @@ import {
   ScrollView,
   Text,
   Share,
+} from "react-native";
+import React from "react";
+import Animated, {
+  Extrapolate,
+  interpolate,
+  interpolateColor,
+  useAnimatedRef,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useDerivedValue,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
+import { LinearGradient } from "expo-linear-gradient";
+import DotsCarousel from "./DotsCarousel";
 
-} from 'react-native'
-import React from 'react'
-import Animated, { Extrapolate, interpolate, interpolateColor, useAnimatedRef, useAnimatedScrollHandler, useAnimatedStyle, useDerivedValue, useSharedValue, withTiming } from 'react-native-reanimated';
-import { LinearGradient } from 'expo-linear-gradient';
-import DotsCarousel from './DotsCarousel';
+const { width, height } = Dimensions.get("window");
 
-const { width, height } = Dimensions.get('window');
-
-const AnimatedCarousel = ({ images, scrollViewImageRef, animatedScrollX, animatedScrollHandler }) => {
-
-
-
+const AnimatedCarousel = ({
+  images,
+  scrollViewImageRef,
+  animatedScrollX,
+  animatedScrollHandler,
+  IMAGE_HEIGHT_RATIO,
+  onGotoIndex,
+}) => {
   // const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
   //     // Dot
   //     const Dot = ({ index }) => {
@@ -80,68 +93,98 @@ const AnimatedCarousel = ({ images, scrollViewImageRef, animatedScrollX, animate
   //         )
   //     }
 
-
-
   // Main Image
 
   const MainImage = ({ image, index }) => {
     const ImageStyle = useAnimatedStyle(() => {
-      const rotateXval = interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [-90, 0, 90], Extrapolate.CLAMP)
-      const scale = interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [5, 1, 5], Extrapolate.CLAMP)
+      const rotateXval = interpolate(
+        animatedScrollX.value,
+        [(index - 1) * width, index * width, (index + 1) * width],
+        [-90, 0, 90],
+        Extrapolate.CLAMP
+      );
+      const scale = interpolate(
+        animatedScrollX.value,
+        [(index - 1) * width, index * width, (index + 1) * width],
+        [5, 1, 5],
+        Extrapolate.CLAMP
+      );
+      const opacity = interpolate(
+        animatedScrollX.value,
+        [(index - 1) * width, index * width, (index + 1) * width],
+        [0, 1, 0],
+        Extrapolate.CLAMP
+      );
       return {
+        opacity: opacity,
         transform: [
           {
             scale,
           },
-          {
-            rotateY: rotateXval + 'deg'
-          },
-        ]
-      }
-    })
+        ],
+      };
+    });
+
     return (
-      <Animated.View style={[{ width: width, alignItems: 'center', justifyContent: 'center' }, ImageStyle]}>
+      <Animated.View
+        style={[
+          {
+            alignItems: "center",
+            justifyContent: "center",
+          },
+          ImageStyle,
+        ]}
+      >
         {/* Top iamge and background with slider */}
 
         {/* Background Image */}
-        <Image source={{ uri: image }}
+        <Animated.Image
+          source={{ uri: image }}
           style={{
-            // width: width - 40,
-            // height: height * 0.4 - 40,
             height: "100%",
-            width: "100%",
-            // borderRadius: 10,
+            width,
           }}
-          resizeMode={'contain'}
+          resizeMode={"cover"}
         />
-
-
       </Animated.View>
-    )
-  }
-
+    );
+  };
 
   // Background image
-
   const AnimatedBackImage = ({ index, image }) => {
     const ImageStyle = useAnimatedStyle(() => {
-      const opacity = interpolate(animatedScrollX.value, [(index - 1) * width, index * width, (index + 1) * width], [0, 1, 0], Extrapolate.CLAMP)
+      const opacity = interpolate(
+        animatedScrollX.value,
+        [(index - 1) * width, index * width, (index + 1) * width],
+        [0, 1, 0],
+        Extrapolate.CLAMP
+      );
       return {
-        opacity: opacity
-      }
-    })
+        opacity: opacity,
+      };
+    });
     return (
-      <Animated.View key={index} style={[StyleSheet.absoluteFillObject, ImageStyle]}>
+      <Animated.View
+        key={index}
+        style={[StyleSheet.absoluteFillObject, ImageStyle]}
+      >
         <Image
           source={{ uri: image }}
           style={StyleSheet.absoluteFillObject}
           blurRadius={100}
-
         />
       </Animated.View>
-    )
-  }
+    );
+  };
 
+  const carouselScale = useAnimatedStyle(() => {
+    return {
+      // transform: [{ scale: IMAGE_HEIGHT_RATIO.value }],
+      width: width,
+      height: height * IMAGE_HEIGHT_RATIO.value,
+      // aspectRatio: 16 / 9,
+    };
+  });
 
   //  scrollViewImageRef,onGotoIndex,animatedScrollX,animatedScrollHandler
 
@@ -151,38 +194,17 @@ const AnimatedCarousel = ({ images, scrollViewImageRef, animatedScrollX, animate
   //     scrollViewImageRef.current?.scrollTo({ x: index * width, y: 0, animated:true});
   //   }
 
-
-
   //   const animatedScrollX = useSharedValue(0);
   //   const animatedScrollHandler = useAnimatedScrollHandler({
   //     onScroll: (event) => {
   //         animatedScrollX.value = event.contentOffset.x;
   //     }
   // })
-
-
-
   return (
-    <View style={[{
-      width: width,
-      height: height * 0.4,
-      overflow: "hidden",
-      // padding:5
-      // borderBottomLeftRadius:20,
-      // borderBottomRightRadius:20,
-    }]}
-    >
-
-      {
-        images.map((image, index) => {
-
-
-          return (
-            <AnimatedBackImage image={image} key={index} index={index} />
-          )
-
-        })
-      }
+    <Animated.View style={[carouselScale]}>
+      {/* {images.map((image, index) => {
+        return <AnimatedBackImage image={image} key={index} index={index} />;
+      })} */}
 
       <Animated.ScrollView
         horizontal
@@ -191,20 +213,12 @@ const AnimatedCarousel = ({ images, scrollViewImageRef, animatedScrollX, animate
         ref={scrollViewImageRef}
         onScroll={animatedScrollHandler}
       >
-
-        {
-          images.map((image, index) => {
-
-            return (
-              <MainImage image={image} key={`image-${index}`} index={index} />
-            )
-          })}
-
+        {images.map((image, index) => {
+          return (
+            <MainImage image={image} key={`image-${index}`} index={index} />
+          );
+        })}
       </Animated.ScrollView>
-
-
-
-
 
       {/* Linear Gradient */}
       {/* <LinearGradient
@@ -224,21 +238,29 @@ const AnimatedCarousel = ({ images, scrollViewImageRef, animatedScrollX, animate
                 </LinearGradient> */}
 
       {/* <DotsCarousel dots={images} onGotoIndex={onGotoIndex} animatedScrollX = {animatedScrollX} /> */}
+      <DotsCarousel
+        animatedScrollX={animatedScrollX}
+        dots={images}
+        onGotoIndex={onGotoIndex}
+        style={{
+          alignItems: "center",
+          width: "100%",
+          position: "absolute",
+          bottom: 0,
+        }}
+      />
+    </Animated.View>
+  );
+};
 
-    </View>
-
-  )
-}
-
-
-export default AnimatedCarousel
+export default AnimatedCarousel;
 
 const styles = StyleSheet.create({
   linearGradient: {
-    alignItems: 'center',
-    position: 'absolute',
+    alignItems: "center",
+    position: "absolute",
     bottom: 0,
     width: width,
     height: 20,
-  }
-})
+  },
+});

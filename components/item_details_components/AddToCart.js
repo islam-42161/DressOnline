@@ -154,11 +154,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderTopLeftRadius: 17,
     borderBottomLeftRadius: 17,
-    // backgroundColor: 'pink',
+    backgroundColor: "white",
     paddingLeft: 5,
     paddingRight: 20,
     height: "100%",
     position: "absolute",
     left: -40,
+    elevation: 5,
   },
 });

@@ -28,13 +28,13 @@ const DotsCarousel = ({ onGotoIndex, dots, animatedScrollX, style }) => {
       const scale = interpolate(
         animatedScrollX.value,
         [(index - 1) * width, index * width, (index + 1) * width],
-        [1, 1.2, 1],
+        [0.8, 1, 0.8],
         Extrapolate.CLAMP
       );
       const color = interpolateColor(
         animatedScrollX.value,
         [(index - 1) * width, index * width, (index + 1) * width],
-        ["rgba(0,0,0,0.5)", "rgba(0,0,0,1)", "rgba(0,0,0,0.5)"]
+        ["lightgray", "black", "lightgray"]
       );
       return {
         backgroundColor: color,
@@ -43,6 +43,7 @@ const DotsCarousel = ({ onGotoIndex, dots, animatedScrollX, style }) => {
             scale: scale,
           },
         ],
+        zIndex: 1,
       };
     });
 
@@ -88,6 +89,7 @@ const DotsCarousel = ({ onGotoIndex, dots, animatedScrollX, style }) => {
       >
         {/* Inner circle */}
         <AnimatedTouchable
+          activeOpacity={1}
           index={index}
           style={[
             {
@@ -107,8 +109,9 @@ const DotsCarousel = ({ onGotoIndex, dots, animatedScrollX, style }) => {
               height: 10,
               width: 10,
               borderRadius: 5,
-              backgroundColor: "rgba(0,0,0,0.3)",
+              backgroundColor: "white",
               position: "absolute",
+              zIndex: -1,
             },
           ]}
         />
@@ -117,11 +120,11 @@ const DotsCarousel = ({ onGotoIndex, dots, animatedScrollX, style }) => {
   };
 
   return (
-    <View>
+    <View style={[style]}>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={[style]}
+        contentContainerStyle={[{ paddingVertical: 5 }]}
       >
         {dots.map((_, index) => (
           <Dot key={index} index={index} />

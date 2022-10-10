@@ -11,11 +11,11 @@ import {
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect } from "react";
+import React, { useEffect, useLayoutEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import ReadmoreCustom from "../components/ReadmoreCustom";
-import AddCommentModal from "../components/AddCommentModal";
+import ReadmoreCustom from "../components/item_details_components/ReadmoreCustom";
+import AddCommentModal from "../components/item_details_components/AddCommentModal";
 
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -24,14 +24,18 @@ import {
   setModalVisible,
   toggleWishlisted,
 } from "../redux/slices/ItemDetailsStates";
-import AnimatedCarousel from "../components/AnimatedCarousel";
-import {
+import AnimatedCarousel from "../components/item_details_components/AnimatedCarousel";
+import Animated, {
+  FadeInDown,
+  FadeOutDown,
   useAnimatedRef,
   useAnimatedScrollHandler,
   useSharedValue,
 } from "react-native-reanimated";
-import DotsCarousel from "../components/DotsCarousel";
-import AddToCart from "../components/AddToCart";
+import DotsCarousel from "../components/item_details_components/DotsCarousel";
+import AddToCart from "../components/item_details_components/AddToCart";
+import BottomSheet from "../components/item_details_components/BottomSheet";
+import { useState } from "react";
 
 const { width, height } = Dimensions.get("window");
 
@@ -41,14 +45,23 @@ const ItemDetails = ({ route, navigation }) => {
   // redux variables
   const dispatch = useDispatch();
 
-  const { items, data, wishlisted, modalVisible } = useSelector((state) => {
-    return {
-      items: state.states.items,
-      data: state.states.data,
-      wishlisted: state.states.wishlisted,
-      modalVisible: state.states.modalVisible,
-    };
-  });
+  const { items, data, wishlisted, modalVisible, seeExtra } = useSelector(
+    (state) => {
+      return {
+        items: state.states.items,
+        data: state.states.data,
+        wishlisted: state.states.wishlisted,
+        modalVisible: state.states.modalVisible,
+        seeExtra: state.states.seeExtra,
+      };
+    }
+  );
+
+  // useLayoutEffect(() => {
+  //   navigation.setOptions({
+  //     header: () => <CustomHeader />,
+  //   });
+  // }, []);
 
   useEffect(() => {
     //fetch(`https://fakestoreapi.com/products/${serial}`)
@@ -81,7 +94,7 @@ const ItemDetails = ({ route, navigation }) => {
   };
 
   let price = data
-    ? data.price - (data.price * (data.discountPercentage / 100)).toFixed(2)
+    ? data.price - (data.price * (data.discountPercentage / 100)).toFixed(1)
     : 0;
 
   const TotalPrice = ({ style }) => (
@@ -107,6 +120,50 @@ const ItemDetails = ({ route, navigation }) => {
     } catch (error) {
       alert(error.message);
     }
+  };
+  const CustomHeader = () => {
+    return (
+      <View
+        style={{
+          width: "100%",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          paddingVertical: 2,
+          // position: "absolute",
+          // top: 0,
+          alignSelf: "center",
+          backgroundColor: "white",
+        }}
+      >
+        {/* <View
+          style={{
+
+          }}
+        > */}
+        <TouchableOpacity
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="chevron-back" size={24} color="black" />
+          <Text
+            style={{
+              fontWeight: "500",
+              textTransform: "uppercase",
+              fontSize: 16,
+            }}
+          >
+            {data.category}
+          </Text>
+        </TouchableOpacity>
+
+        <ActionButtons />
+        {/* </View> */}
+      </View>
+    );
   };
 
   // heart, share, comment
@@ -179,150 +236,155 @@ const ItemDetails = ({ route, navigation }) => {
     },
   });
 
-  return (
-    <SafeAreaView style={styles.container}>
-      {data ? (
-        <View>
-          <AddCommentModal
-            modalVisible={modalVisible}
-            setModalVisible={(value) => dispatch(setModalVisible(value))}
-          />
-
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: 10,
-            }}
-          >
-            <TouchableOpacity
-              style={{ flexDirection: "row", alignItems: "center" }}
-              onPress={() => navigation.goBack()}
-            >
-              <Ionicons name="chevron-back" size={32} color="black" />
-              <Text
-                style={{
-                  fontWeight: "500",
-                  textTransform: "uppercase",
-                  fontSize: 16,
-                }}
-              >
-                {data.category}
-              </Text>
-            </TouchableOpacity>
-            <ActionButtons />
-          </View>
-          {/* Animated carousel*/}
-          {/* scrollViewImageRef,onGotoIndex,animatedScrollX,animatedScrollHandler */}
-          <AnimatedCarousel
-            images={data.images}
-            animatedScrollHandler={animatedScrollHandler}
-            animatedScrollX={animatedScrollX}
-            scrollViewImageRef={scrollViewImageRef}
-          />
-
-          {/* bottom sheet */}
-
-          <View style={styles.bottomSheetStyle}>
-            {/* extra infos */}
-
-            <View style={styles.extraInfoStyle}>
-              <Text
-                style={{
-                  ...styles.textStyle,
-                  fontWeight: "normal",
-                  fontSize: 14,
-                }}
-                numberOfLines={1}
-                adjustsFontSizeToFit
-              >
-                {data.brand}
-              </Text>
-
-              <DotsCarousel
-                animatedScrollX={animatedScrollX}
-                dots={data.images}
-                onGotoIndex={onGotoIndex}
-                style={{ paddingVertical: 5 }}
-              />
-            </View>
-
-            {/* product title and brand*/}
-            <Text
-              style={[styles.textStyle, { fontSize: 24 }]}
-              numberOfLines={1}
-              adjustsFontSizeToFit
-            >
-              {data.title}
-            </Text>
-            <View
-              style={{
-                flexDirection: "row",
-                marginTop: 5,
-                alignSelf: "flex-start",
-              }}
-            >
-              <Text
-                style={{ fontWeight: "bold", fontSize: 20, lineHeight: 30 }}
-                adjustsFontSizeToFit
-                numberOfLines={1}
-              >
-                ${price}
-              </Text>
-              <Text
-                style={{
-                  textDecorationLine: "line-through",
-                  fontSize: 11,
-                  lineHeight: 37,
-                  marginLeft: 2,
-                  color: "lightgray",
-                }}
-              >
-                ${data.price}
-              </Text>
-            </View>
-
-            <View style={{ width: "100%", marginBottom: 10 }}>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                {/* category */}
-                <View style={styles.miniscrollItemStyle}>
-                  <Text>Rating: ⭐ {data.rating}</Text>
-                </View>
-                {/* discount rate */}
-                <View style={[styles.miniscrollItemStyle]}>
-                  <Text>
-                    Discount:{" "}
-                    <Text style={{ fontWeight: "bold" }}>
-                      {data.discountPercentage}%
-                    </Text>
-                  </Text>
-                </View>
-                {/* category */}
-                <View style={styles.miniscrollItemStyle}>
-                  <Text>
-                    In stock:{" "}
-                    <Text style={{ fontWeight: "bold" }}>{data.stock}</Text>
-                  </Text>
-                </View>
-              </ScrollView>
-            </View>
-
-            {/* rating, discount rate */}
-            <ReadmoreCustom
-              descriptiveText={data.description}
-              numberOfLines={5}
-              textstyle={{ lineHeight: 21, fontSize: 14 }}
-            />
-          </View>
-
-          <AddToCart dispatch={dispatch} setItems={setItems} items={items} />
-        </View>
-      ) : (
-        <ActivityIndicator />
-      )}
-    </SafeAreaView>
+  const TitleandPrice = () => (
+    <View
+      style={{
+        width: "100%",
+        alignItems: "flex-start",
+        paddingHorizontal: 20,
+        paddingTop: 5,
+        justifyContent: "center",
+        // backgroundColor: "pink",
+        // position: "absolute",
+      }}
+    >
+      <Text
+        style={{
+          ...styles.textStyle,
+          fontWeight: "normal",
+          fontSize: 14,
+        }}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+      >
+        {data.brand}
+      </Text>
+      {/* product title and brand*/}
+      <Text
+        style={[styles.textStyle, { fontSize: 24, fontWeight: "900" }]}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+      >
+        {data.title}
+      </Text>
+      <View
+        style={{
+          flexDirection: "row",
+          marginTop: 5,
+          alignSelf: "flex-start",
+        }}
+      >
+        <Text
+          style={{ fontWeight: "bold", fontSize: 20, lineHeight: 30 }}
+          adjustsFontSizeToFit
+          numberOfLines={1}
+        >
+          ${price}
+        </Text>
+        <Text
+          style={{
+            textDecorationLine: "line-through",
+            fontSize: 11,
+            lineHeight: 37,
+            marginLeft: 2,
+            color: "lightgray",
+          }}
+        >
+          ${data.price}
+        </Text>
+      </View>
+    </View>
   );
+
+  const IMAGE_HEIGHT_RATIO = useSharedValue(0.65);
+  if (data) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <CustomHeader />
+        <AddCommentModal
+          modalVisible={modalVisible}
+          setModalVisible={(value) => dispatch(setModalVisible(value))}
+        />
+
+        {/* Animated carousel*/}
+        {/* scrollViewImageRef,onGotoIndex,animatedScrollX,animatedScrollHandler */}
+        <AnimatedCarousel
+          images={data.images}
+          animatedScrollHandler={animatedScrollHandler}
+          animatedScrollX={animatedScrollX}
+          scrollViewImageRef={scrollViewImageRef}
+          IMAGE_HEIGHT_RATIO={IMAGE_HEIGHT_RATIO}
+          onGotoIndex={onGotoIndex}
+        />
+
+        {/* <DotsCarousel
+          animatedScrollX={animatedScrollX}
+          dots={data.images}
+          onGotoIndex={onGotoIndex}
+          style={{
+            alignItems: "center",
+            width: "100%",
+          }}
+        /> */}
+
+        {/* <CustomHeader /> */}
+        <TitleandPrice />
+
+        <BottomSheet IMAGE_HEIGHT_RATIO={IMAGE_HEIGHT_RATIO}>
+          <View style={styles.bottomSheetStyle}>
+            {/* reanimated extra info */}
+            {seeExtra && (
+              <Animated.View
+                style={{ flex: 1 }}
+                entering={FadeInDown}
+                exiting={FadeOutDown}
+              >
+                <View style={{ width: "100%", marginBottom: 10 }}>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    {/* category */}
+                    <View style={styles.miniscrollItemStyle}>
+                      <Text>Rating: ⭐ {data.rating}</Text>
+                    </View>
+                    {/* discount rate */}
+                    <View style={[styles.miniscrollItemStyle]}>
+                      <Text>
+                        Discount:{" "}
+                        <Text style={{ fontWeight: "bold" }}>
+                          {data.discountPercentage}%
+                        </Text>
+                      </Text>
+                    </View>
+                    {/* category */}
+                    <View style={styles.miniscrollItemStyle}>
+                      <Text>
+                        In stock:{" "}
+                        <Text style={{ fontWeight: "bold" }}>{data.stock}</Text>
+                      </Text>
+                    </View>
+                  </ScrollView>
+                </View>
+
+                {/* rating, discount rate */}
+                <ReadmoreCustom
+                  descriptiveText={data.description}
+                  numberOfLines={5}
+                  textstyle={{ lineHeight: 21, fontSize: 14 }}
+                />
+              </Animated.View>
+            )}
+          </View>
+        </BottomSheet>
+
+        <AddToCart dispatch={dispatch} setItems={setItems} items={items} />
+      </SafeAreaView>
+    );
+  } else {
+    return (
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
 };
 
 export default ItemDetails;
@@ -330,14 +392,13 @@ export default ItemDetails;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    // justifyContent: "center",
     alignItems: "center",
     backgroundColor: "white",
   },
   bottomSheetStyle: {
+    marginHorizontal: 20,
     flex: 1,
-    width,
-    padding: 10,
   },
   textStyle: {
     fontWeight: "800",

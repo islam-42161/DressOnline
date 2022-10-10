@@ -1,25 +1,21 @@
 import React, { useEffect, useState } from "react";
-import {
-  StyleSheet,
-  Dimensions,
-} from "react-native";
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { StyleSheet, Dimensions } from "react-native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-
-import ItemDetails from './ItemDetails';
+import ItemDetails from "./ItemDetails";
 import ItemList from "./ItemList";
 
 const StackNavigator = createNativeStackNavigator().Navigator;
 const StackScreen = createNativeStackNavigator().Screen;
 
-
 export default function Home() {
-
-
   return (
-    <StackNavigator initialRouteName="ItemList" screenOptions={{
-      header: () => null,
-    }}>
+    <StackNavigator
+      initialRouteName="ItemList"
+      screenOptions={{
+        header: () => null,
+      }}
+    >
       <StackScreen name="ItemList" component={ItemList} />
       <StackScreen name="ItemDetails" component={ItemDetails} />
     </StackNavigator>
