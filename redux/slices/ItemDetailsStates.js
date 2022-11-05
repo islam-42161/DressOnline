@@ -4,8 +4,7 @@ const initialState = {
   items: 0,
   data: null,
   wishlisted: false,
-  modalVisible: false,
-  seeExtra: false,
+  seeExtra: true,
 };
 
 const ItemDetailsStates = createSlice({
@@ -21,9 +20,6 @@ const ItemDetailsStates = createSlice({
     toggleWishlisted: (state) => {
       state.wishlisted = !state.wishlisted;
     },
-    setModalVisible: (state, action) => {
-      state.modalVisible = action.payload;
-    },
     setSeeExtra: (state, action) => {
       state.seeExtra = action.payload;
     },
@@ -31,12 +27,7 @@ const ItemDetailsStates = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const {
-  setItems,
-  setData,
-  toggleWishlisted,
-  setModalVisible,
-  setSeeExtra,
-} = ItemDetailsStates.actions;
+export const { setItems, setData, toggleWishlisted, setSeeExtra } =
+  ItemDetailsStates.actions;
 
 export default ItemDetailsStates.reducer;

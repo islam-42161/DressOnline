@@ -9,24 +9,24 @@ import {
   Share,
   ScrollView,
 } from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Entypo } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useLayoutEffect } from "react";
+import React, { useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import ReadmoreCustom from "../components/item_details_components/ReadmoreCustom";
-import AddCommentModal from "../components/item_details_components/AddCommentModal";
 
 import { useDispatch, useSelector } from "react-redux";
 import {
   setData,
   setItems,
-  setModalVisible,
   toggleWishlisted,
 } from "../redux/slices/ItemDetailsStates";
 import AnimatedCarousel from "../components/item_details_components/AnimatedCarousel";
 import Animated, {
+  FadeIn,
   FadeInDown,
+  FadeOut,
   FadeOutDown,
   useAnimatedRef,
   useAnimatedScrollHandler,
@@ -45,17 +45,14 @@ const ItemDetails = ({ route, navigation }) => {
   // redux variables
   const dispatch = useDispatch();
 
-  const { items, data, wishlisted, modalVisible, seeExtra } = useSelector(
-    (state) => {
-      return {
-        items: state.states.items,
-        data: state.states.data,
-        wishlisted: state.states.wishlisted,
-        modalVisible: state.states.modalVisible,
-        seeExtra: state.states.seeExtra,
-      };
-    }
-  );
+  const { items, data, wishlisted, seeExtra } = useSelector((state) => {
+    return {
+      items: state.states.items,
+      data: state.states.data,
+      wishlisted: state.states.wishlisted,
+      seeExtra: state.states.seeExtra,
+    };
+  });
 
   // useLayoutEffect(() => {
   //   navigation.setOptions({
@@ -123,32 +120,49 @@ const ItemDetails = ({ route, navigation }) => {
   };
   const CustomHeader = () => {
     return (
-      <View
+      <SafeAreaView
         style={{
-          width: "100%",
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
-          paddingVertical: 2,
+          paddingVertical: 4,
+          paddingHorizontal: 4,
+          borderBottomRightRadius: 20,
+          borderBottomLeftRadius: 20,
           // position: "absolute",
+          width: width,
           // top: 0,
+          right: 0,
+          left: 0,
           alignSelf: "center",
-          backgroundColor: "white",
+          // backgroundColor: "white",
+          // elevation: 5,
+          // zIndex: 1000000000000,
         }}
       >
-        {/* <View
-          style={{
-
-          }}
-        > */}
         <TouchableOpacity
           style={{
             flexDirection: "row",
             alignItems: "center",
           }}
           onPress={() => navigation.goBack()}
+          activeOpacity={1}
         >
-          <Ionicons name="chevron-back" size={24} color="black" />
+          <Ionicons
+            name="arrow-back"
+            style={{
+              color: "black",
+              fontSize: 24,
+              backgroundColor: "white",
+              height: 28,
+              width: 28,
+              borderRadius: 14,
+              textAlign: "center",
+              textAlignVertical: "center",
+              marginHorizontal: 5,
+              // elevation: 5,
+            }}
+          />
           <Text
             style={{
               fontWeight: "500",
@@ -161,8 +175,7 @@ const ItemDetails = ({ route, navigation }) => {
         </TouchableOpacity>
 
         <ActionButtons />
-        {/* </View> */}
-      </View>
+      </SafeAreaView>
     );
   };
 
@@ -170,50 +183,35 @@ const ItemDetails = ({ route, navigation }) => {
 
   const ActionButtons = () => {
     return (
-      <View style={{ justifyContent: "space-between", flexDirection: "row" }}>
-        <TouchableOpacity
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <Ionicons
+          name={wishlisted ? "heart" : "heart-outline"}
           style={{
-            alignItems: "center",
-            justifyContent: "center",
-            width: 32,
-            height: 32,
-            padding: 4,
+            fontSize: 24,
+            color: "#ED4255",
+            marginRight: 5,
           }}
           onPress={toggleWishList}
-        >
-          <MaterialCommunityIcons
-            name="heart"
-            size={24}
-            color={wishlisted ? "#ED4255" : "lightgray"}
-          />
-        </TouchableOpacity>
+        />
 
-        <TouchableOpacity
+        <Ionicons
+          name="share-outline"
           style={{
-            alignItems: "center",
-            justifyContent: "center",
-            width: 32,
-            height: 32,
-            padding: 4,
-            marginHorizontal: 5,
+            fontSize: 24,
+            color: "black",
+            marginRight: 5,
           }}
           onPress={onShare}
-        >
-          <Ionicons name="ios-share-outline" size={24} />
-        </TouchableOpacity>
-
-        <TouchableOpacity
+        />
+        <Ionicons
+          name="add"
           style={{
-            alignItems: "center",
-            justifyContent: "center",
-            width: 32,
-            height: 32,
-            padding: 4,
+            fontSize: 24,
+            color: "black",
+            marginRight: 5,
           }}
-          onPress={() => dispatch(setModalVisible(!modalVisible))}
-        >
-          <MaterialCommunityIcons name="comment-account-outline" size={24} />
-        </TouchableOpacity>
+          onPress={() => console.log("clicked on two dots menu")}
+        />
       </View>
     );
   };
@@ -236,7 +234,7 @@ const ItemDetails = ({ route, navigation }) => {
     },
   });
 
-  const TitleandPrice = () => (
+  const TitleandPrice = ({ extraStyle }) => (
     <View
       style={{
         width: "100%",
@@ -246,13 +244,14 @@ const ItemDetails = ({ route, navigation }) => {
         justifyContent: "center",
         // backgroundColor: "pink",
         // position: "absolute",
+        ...extraStyle,
       }}
     >
       <Text
         style={{
           ...styles.textStyle,
           fontWeight: "normal",
-          fontSize: 14,
+          fontSize: 16,
         }}
         numberOfLines={1}
         adjustsFontSizeToFit
@@ -261,7 +260,7 @@ const ItemDetails = ({ route, navigation }) => {
       </Text>
       {/* product title and brand*/}
       <Text
-        style={[styles.textStyle, { fontSize: 24, fontWeight: "900" }]}
+        style={[styles.textStyle, { fontSize: 32, fontWeight: "900" }]}
         numberOfLines={1}
         adjustsFontSizeToFit
       >
@@ -275,7 +274,7 @@ const ItemDetails = ({ route, navigation }) => {
         }}
       >
         <Text
-          style={{ fontWeight: "bold", fontSize: 20, lineHeight: 30 }}
+          style={{ fontWeight: "bold", fontSize: 24, lineHeight: 30 }}
           adjustsFontSizeToFit
           numberOfLines={1}
         >
@@ -284,7 +283,7 @@ const ItemDetails = ({ route, navigation }) => {
         <Text
           style={{
             textDecorationLine: "line-through",
-            fontSize: 11,
+            fontSize: 12,
             lineHeight: 37,
             marginLeft: 2,
             color: "lightgray",
@@ -296,15 +295,11 @@ const ItemDetails = ({ route, navigation }) => {
     </View>
   );
 
-  const IMAGE_HEIGHT_RATIO = useSharedValue(0.65);
+  const IMAGE_HEIGHT_RATIO = useSharedValue(0.7);
   if (data) {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
         <CustomHeader />
-        <AddCommentModal
-          modalVisible={modalVisible}
-          setModalVisible={(value) => dispatch(setModalVisible(value))}
-        />
 
         {/* Animated carousel*/}
         {/* scrollViewImageRef,onGotoIndex,animatedScrollX,animatedScrollHandler */}
@@ -327,12 +322,24 @@ const ItemDetails = ({ route, navigation }) => {
           }}
         /> */}
 
-        {/* <CustomHeader /> */}
-        <TitleandPrice />
-
-        <BottomSheet IMAGE_HEIGHT_RATIO={IMAGE_HEIGHT_RATIO}>
+        <BottomSheet
+          IMAGE_HEIGHT_RATIO={IMAGE_HEIGHT_RATIO}
+          snap_points={[0.3, 0.6, 1]}
+        >
           <View style={styles.bottomSheetStyle}>
             {/* reanimated extra info */}
+            {!seeExtra && (
+              <Animated.Text
+                entering={FadeIn}
+                exiting={FadeOut}
+                style={{ alignSelf: "center" }}
+              >
+                Slide up to see more
+              </Animated.Text>
+            )}
+            <TitleandPrice
+              extraStyle={{ paddingHorizontal: 0, paddingTop: 0 }}
+            />
             {seeExtra && (
               <Animated.View
                 style={{ flex: 1 }}
@@ -376,7 +383,7 @@ const ItemDetails = ({ route, navigation }) => {
         </BottomSheet>
 
         <AddToCart dispatch={dispatch} setItems={setItems} items={items} />
-      </SafeAreaView>
+      </View>
     );
   } else {
     return (

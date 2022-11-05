@@ -7,6 +7,7 @@ import {
   ScrollView,
   Text,
   Share,
+  StatusBar,
 } from "react-native";
 import React from "react";
 import Animated, {
@@ -144,7 +145,7 @@ const AnimatedCarousel = ({
             height: "100%",
             width,
           }}
-          resizeMode={"cover"}
+          resizeMode={"contain"}
         />
       </Animated.View>
     );
@@ -182,6 +183,7 @@ const AnimatedCarousel = ({
       // transform: [{ scale: IMAGE_HEIGHT_RATIO.value }],
       width: width,
       height: height * IMAGE_HEIGHT_RATIO.value,
+      paddingBottom: 1.5 * StatusBar.currentHeight,
       // aspectRatio: 16 / 9,
     };
   });
@@ -246,7 +248,8 @@ const AnimatedCarousel = ({
           alignItems: "center",
           width: "100%",
           position: "absolute",
-          bottom: 0,
+          bottom: 1.5 * StatusBar.currentHeight,
+          // marginBottom: 1.5 * StatusBar.currentHeight,
         }}
       />
     </Animated.View>
