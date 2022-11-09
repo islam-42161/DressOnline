@@ -13,6 +13,7 @@ import Animated, {
   FadeIn,
 } from "react-native-reanimated";
 import {
+  Gesture,
   GestureHandlerRootView,
   PanGestureHandler,
 } from "react-native-gesture-handler";
@@ -20,6 +21,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useDispatch } from "react-redux";
 import { setSeeExtra } from "../../redux/slices/ItemDetailsStates";
+import { SafeAreaView } from "react-native-safe-area-context";
 const { width, height } = Dimensions.get("window");
 
 const STATUS_BAR_HEIGHT = StatusBar.currentHeight;
@@ -32,11 +34,19 @@ const BottomSheet = (props) => {
   const thirdPosition = height * (1 - snap_points[2]); // statusbar matching with bottom sheet color
   // const thirdPosition = height * (1 - snap_points[2]) + STATUS_BAR_HEIGHT;
 
-  const top = useSharedValue(initialPosition);
-
   function changeView(value) {
     dispatch(setSeeExtra(value));
   }
+
+  const top = useSharedValue(initialPosition);
+  // const swipeGesture = Gesture.Pan()
+  // const panGesture = Gesture.Pan()
+  //   .activeOffsetY([-10,10])
+  //   .onStart(()=>start.value = 0)
+  //   .onUpdate(()=>{
+
+  //   })
+  // const composedGesture = Gesture.Race([swipeGesture,panGesture])
   const gestureHandler = useAnimatedGestureHandler({
     onStart: (_, ctx) => {
       ctx.startTop = top.value;
@@ -45,8 +55,11 @@ const BottomSheet = (props) => {
       top.value = ctx.startTop + event.translationY;
       if (top.value < thirdPosition) top.value = thirdPosition;
       if (top.value > initialPosition) top.value = initialPosition;
-      IMAGE_HEIGHT_RATIO.value = top.value / (height + 50);
-      // console.log(top.value);
+      // console.log(top.value / (height + 35));
+      IMAGE_HEIGHT_RATIO.value = top.value / (height + 35);
+
+      // event.translationY = -50 --> swipe up for 50px
+      // event.translationY = 50  --> swipe down for 50px
     },
     onEnd: (_) => {
       if (top.value > secondPosition + 100) {
@@ -67,20 +80,20 @@ const BottomSheet = (props) => {
     return {
       elevation: interpolate(
         top.value,
-        [thirdPosition, secondPosition, initialPosition],
-        [0, 5, 20],
+        [secondPosition, initialPosition],
+        [0, 30],
         Extrapolate.CLAMP
       ),
       borderTopLeftRadius: interpolate(
         top.value,
         [secondPosition, initialPosition],
-        [0, 20],
+        [0, 30],
         Extrapolate.CLAMP
       ),
       borderTopRightRadius: interpolate(
         top.value,
         [secondPosition, initialPosition],
-        [0, 20],
+        [0, 30],
         Extrapolate.CLAMP
       ),
       top: top.value,
@@ -109,7 +122,8 @@ const BottomSheet = (props) => {
 
   const AnimatedIcon = Animated.createAnimatedComponent(Ionicons);
   return (
-    <Animated.View style={[styles.bottomSheetStyle, animatedStyle]}>
+    <Animated.View style={[styles.container, animatedStyle]}>
+      {/* GestureHandlerRootView for PanGestureHandler from Reanimated */}
       <GestureHandlerRootView>
         <PanGestureHandler
           onGestureEvent={gestureHandler}
@@ -127,14 +141,17 @@ const BottomSheet = (props) => {
             }}
           />
            */}
-          <Animated.View style={[styles.innerBottomSheetView]}>
+
+          <Animated.View style={[styles.bottomSheetStyle]}>
             <AnimatedIcon
               name="chevron-up-sharp"
               size={32}
-              color={"gray"}
+              color={"#6750A4"}
               style={[draggerStyle]}
             />
-            {props.children}
+            <SafeAreaView style={styles.innerView}>
+              {props.children}
+            </SafeAreaView>
           </Animated.View>
         </PanGestureHandler>
       </GestureHandlerRootView>
@@ -145,17 +162,22 @@ const BottomSheet = (props) => {
 export default BottomSheet;
 
 const styles = StyleSheet.create({
-  bottomSheetStyle: {
+  container: {
     position: "absolute",
-    height: height,
+    height: height + STATUS_BAR_HEIGHT,
     right: 0,
     left: 0,
     overflow: "hidden",
+    zIndex: 1,
+    backgroundColor: "pink",
   },
-  innerBottomSheetView: {
+  bottomSheetStyle: {
     width: "100%",
     height: "100%",
-    backgroundColor: "white",
-    paddingTop: STATUS_BAR_HEIGHT,
+    backgroundColor: "#EADDFF",
+  },
+  innerView: {
+    flex: 1,
+    paddingBottom: 100,
   },
 });

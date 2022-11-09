@@ -141,6 +141,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     // justifyContent: 'space-between',
     flexDirection: "row",
+    zIndex: 2,
   },
   cartButton: {
     width: 34,
