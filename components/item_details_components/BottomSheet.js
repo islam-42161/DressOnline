@@ -14,6 +14,7 @@ import Animated, {
 } from "react-native-reanimated";
 import {
   Gesture,
+  GestureDetector,
   GestureHandlerRootView,
   PanGestureHandler,
 } from "react-native-gesture-handler";
@@ -37,45 +38,109 @@ const BottomSheet = (props) => {
   function changeView(value) {
     dispatch(setSeeExtra(value));
   }
-
   const top = useSharedValue(initialPosition);
-  // const swipeGesture = Gesture.Pan()
-  // const panGesture = Gesture.Pan()
-  //   .activeOffsetY([-10,10])
-  //   .onStart(()=>start.value = 0)
-  //   .onUpdate(()=>{
+  const start = useSharedValue(0);
+  const swipe_velocity = useSharedValue(0);
 
-  //   })
-  // const composedGesture = Gesture.Race([swipeGesture,panGesture])
-  const gestureHandler = useAnimatedGestureHandler({
-    onStart: (_, ctx) => {
-      ctx.startTop = top.value;
-    },
-    onActive: (event, ctx) => {
-      top.value = ctx.startTop + event.translationY;
+  // pan gesture
+  const panGesture = Gesture.Pan()
+    .activeOffsetY([-10, 10])
+    .onStart(() => (start.value = top.value))
+    .onUpdate((e) => {
+      top.value = start.value + e.translationY;
       if (top.value < thirdPosition) top.value = thirdPosition;
       if (top.value > initialPosition) top.value = initialPosition;
       // console.log(top.value / (height + 35));
       IMAGE_HEIGHT_RATIO.value = top.value / (height + 35);
+    })
+    .onEnd((e, completed) => {
+      swipe_velocity.value = e.velocityY;
+      console.log(swipe_velocity.value);
+      start.value = top.value;
 
-      // event.translationY = -50 --> swipe up for 50px
-      // event.translationY = 50  --> swipe down for 50px
-    },
-    onEnd: (_) => {
-      if (top.value > secondPosition + 100) {
-        top.value = withTiming(initialPosition); // take bottom sheet to initial position
-        IMAGE_HEIGHT_RATIO.value = withTiming(1 - snap_points[0]);
-        // runOnJS(changeView)(false);
-      } else if (top.value > thirdPosition + 200) {
-        top.value = withTiming(secondPosition); // take bottom sheet to second position
-        IMAGE_HEIGHT_RATIO.value = withTiming(1 - snap_points[1]);
-        // runOnJS(changeView)(true);
-      } else if (top.value >= thirdPosition || top.value < thirdPosition) {
-        top.value = withTiming(thirdPosition); // take bottom sheet to third position
-        // runOnJS(changeView)(true);
+      // --------- swipe with swipe velocity --------------
+
+      // swipe up?
+      if (swipe_velocity.value < -2000) {
+        // take bottom sheet to second position
+        if (top.value === initialPosition) {
+          top.value = withTiming(secondPosition);
+          IMAGE_HEIGHT_RATIO.value = withTiming(1 - snap_points[1]);
+        }
+        // take bottom sheet to third position
+        else if (top.value === secondPosition) {
+          top.value = withTiming(thirdPosition);
+        }
       }
-    },
-  });
+      // swipe down?
+      else if (swipe_velocity.value > 2000) {
+        // take bottom sheet to second position
+        if (top.value === thirdPosition) {
+          top.value = withTiming(secondPosition);
+          IMAGE_HEIGHT_RATIO.value = withTiming(1 - snap_points[1]);
+        }
+        // take bottom sheet to initial position
+        else if (top.value === secondPosition) {
+          top.value = withTiming(initialPosition); // take bottom sheet to initial position
+          IMAGE_HEIGHT_RATIO.value = withTiming(1 - snap_points[0]);
+        }
+      }
+
+      // --------- conditional auto panning --------------
+      else {
+        if (top.value > secondPosition + 100) {
+          top.value = withTiming(initialPosition); // take bottom sheet to initial position
+          IMAGE_HEIGHT_RATIO.value = withTiming(1 - snap_points[0]);
+          // runOnJS(changeView)(false);
+        } else if (top.value > thirdPosition + 200) {
+          top.value = withTiming(secondPosition); // take bottom sheet to second position
+          IMAGE_HEIGHT_RATIO.value = withTiming(1 - snap_points[1]);
+          // runOnJS(changeView)(true);
+        } else if (top.value >= thirdPosition || top.value < thirdPosition) {
+          top.value = withTiming(thirdPosition); // take bottom sheet to third position
+          // runOnJS(changeView)(true);
+        }
+      }
+    });
+
+  //swipe gesture
+  const swipe_val = useSharedValue(0);
+  const swipeGesture = Gesture.Pan()
+    .activeOffsetY([-10, 10])
+    .onStart(() => (swipe_val.value = 0))
+    .onUpdate((e) => {
+      swipe_val.value = e.translationY;
+    })
+    .onEnd(() => {
+      // swipe up?
+      if (swipe_val.value < -20) {
+        // take bottom sheet to second position
+        if (top.value === initialPosition) {
+          top.value = withTiming(secondPosition);
+          IMAGE_HEIGHT_RATIO.value = withTiming(1 - snap_points[1]);
+        }
+        // take bottom sheet to third position
+        else if (top.value === secondPosition) {
+          top.value = withTiming(thirdPosition);
+        }
+      }
+      // swipe down?
+      else if (swipe_val.value > 20) {
+        // take bottom sheet to second position
+        if (top.value === thirdPosition) {
+          top.value = withTiming(secondPosition);
+          IMAGE_HEIGHT_RATIO.value = withTiming(1 - snap_points[1]);
+        }
+        // take bottom sheet to initial position
+        else if (top.value === secondPosition) {
+          top.value = withTiming(initialPosition); // take bottom sheet to initial position
+          IMAGE_HEIGHT_RATIO.value = withTiming(1 - snap_points[0]);
+        }
+      }
+    });
+
+  const composedGesture = Gesture.Race(panGesture, swipeGesture);
+
   const animatedStyle = useAnimatedStyle(() => {
     return {
       elevation: interpolate(
@@ -99,6 +164,7 @@ const BottomSheet = (props) => {
       top: top.value,
     };
   });
+
   const draggerStyle = useAnimatedStyle(() => {
     const scaleY = interpolate(
       top.value,
@@ -123,12 +189,8 @@ const BottomSheet = (props) => {
   const AnimatedIcon = Animated.createAnimatedComponent(Ionicons);
   return (
     <Animated.View style={[styles.container, animatedStyle]}>
-      {/* GestureHandlerRootView for PanGestureHandler from Reanimated */}
       <GestureHandlerRootView>
-        <PanGestureHandler
-          onGestureEvent={gestureHandler}
-          activeOffsetY={[-10, 10]}
-        >
+        <GestureDetector gesture={panGesture}>
           {/* 
           <View
             style={{
@@ -153,7 +215,7 @@ const BottomSheet = (props) => {
               {props.children}
             </SafeAreaView>
           </Animated.View>
-        </PanGestureHandler>
+        </GestureDetector>
       </GestureHandlerRootView>
     </Animated.View>
   );
