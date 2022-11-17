@@ -38,9 +38,27 @@ const BottomSheet = (props) => {
   function changeView(value) {
     dispatch(setSeeExtra(value));
   }
+
   const top = useSharedValue(initialPosition);
   const start = useSharedValue(0);
   const swipe_velocity = useSharedValue(0);
+
+  // position snapping method
+  function snapPosition() {
+    "worklet";
+    if (top.value > secondPosition + 100) {
+      top.value = withTiming(initialPosition); // take bottom sheet to initial position
+      IMAGE_HEIGHT_RATIO.value = withTiming(1 - snap_points[0]);
+      // runOnJS(changeView)(false);
+    } else if (top.value > thirdPosition + 200) {
+      top.value = withTiming(secondPosition); // take bottom sheet to second position
+      IMAGE_HEIGHT_RATIO.value = withTiming(1 - snap_points[1]);
+      // runOnJS(changeView)(true);
+    } else if (top.value >= thirdPosition || top.value < thirdPosition) {
+      top.value = withTiming(thirdPosition); // take bottom sheet to third position
+      // runOnJS(changeView)(true);
+    }
+  }
 
   // pan gesture
   const panGesture = Gesture.Pan()
@@ -52,55 +70,11 @@ const BottomSheet = (props) => {
       if (top.value > initialPosition) top.value = initialPosition;
       // console.log(top.value / (height + 35));
       IMAGE_HEIGHT_RATIO.value = top.value / (height + 35);
+      swipe_velocity.value = e.velocityY;
     })
     .onEnd((e, completed) => {
-      swipe_velocity.value = e.velocityY;
-      console.log(swipe_velocity.value);
       start.value = top.value;
-
-      // --------- swipe with swipe velocity --------------
-
-      // swipe up?
-      if (swipe_velocity.value < -2000) {
-        // take bottom sheet to second position
-        if (top.value === initialPosition) {
-          top.value = withTiming(secondPosition);
-          IMAGE_HEIGHT_RATIO.value = withTiming(1 - snap_points[1]);
-        }
-        // take bottom sheet to third position
-        else if (top.value === secondPosition) {
-          top.value = withTiming(thirdPosition);
-        }
-      }
-      // swipe down?
-      else if (swipe_velocity.value > 2000) {
-        // take bottom sheet to second position
-        if (top.value === thirdPosition) {
-          top.value = withTiming(secondPosition);
-          IMAGE_HEIGHT_RATIO.value = withTiming(1 - snap_points[1]);
-        }
-        // take bottom sheet to initial position
-        else if (top.value === secondPosition) {
-          top.value = withTiming(initialPosition); // take bottom sheet to initial position
-          IMAGE_HEIGHT_RATIO.value = withTiming(1 - snap_points[0]);
-        }
-      }
-
-      // --------- conditional auto panning --------------
-      else {
-        if (top.value > secondPosition + 100) {
-          top.value = withTiming(initialPosition); // take bottom sheet to initial position
-          IMAGE_HEIGHT_RATIO.value = withTiming(1 - snap_points[0]);
-          // runOnJS(changeView)(false);
-        } else if (top.value > thirdPosition + 200) {
-          top.value = withTiming(secondPosition); // take bottom sheet to second position
-          IMAGE_HEIGHT_RATIO.value = withTiming(1 - snap_points[1]);
-          // runOnJS(changeView)(true);
-        } else if (top.value >= thirdPosition || top.value < thirdPosition) {
-          top.value = withTiming(thirdPosition); // take bottom sheet to third position
-          // runOnJS(changeView)(true);
-        }
-      }
+      snapPosition();
     });
 
   //swipe gesture
